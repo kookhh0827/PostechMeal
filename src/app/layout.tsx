@@ -2,6 +2,7 @@ import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Metadata } from 'next';
 import * as React from 'react';
+import { FaGithub } from 'react-icons/fa';
 
 import '@/styles/globals.css';
 // !STARTERCONF This is for demo purposes, remove @/styles/colors.css import immediately
@@ -61,6 +62,24 @@ export default function RootLayout({
       <Analytics />
       <SpeedInsights />
       <body>{children}</body>
+      <footer className='mt-auto bg-gray-800 text-white py-4 text-sm px-1.5'>
+        <div className='container mx-auto flex justify-between items-center'>
+          <div className='flex items-center'>
+            <a
+              href='https://github.com/kookhh0827/PostechMeal'
+              target='_blank'
+              rel='noopener noreferrer'
+              className='flex items-center space-x-2'
+            >
+              <FaGithub className='text-2xl' />
+              <span>Github Repo</span>
+            </a>
+          </div>
+          <div>
+            <p>문의: kookhh0827@postech.ac.kr</p>
+          </div>
+        </div>
+      </footer>
     </html>
   );
 }

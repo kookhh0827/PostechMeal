@@ -28,7 +28,6 @@ function mealtypetokorean(mealtype: string) {
 
 const MealCalendar: React.FC<MealCalendarProps> = ({ restaurantId }) => {
   const [selectedWeek, setSelectedWeek] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState(new Date());
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [meals, setMeals] = useState<Meal[]>([]);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
@@ -152,17 +151,15 @@ const MealCalendar: React.FC<MealCalendarProps> = ({ restaurantId }) => {
   const endOfWeekDate = endOfWeek(selectedWeek, { weekStartsOn: 1 });
 
   const handlePrevDay = () => {
-    setSelectedDate((prevDate) => addDays(prevDate, -1));
+    setSelectedWeek((prevDate) => addDays(prevDate, -1));
   };
 
   const handleNextDay = () => {
-    setSelectedDate((prevDate) => addDays(prevDate, 1));
+    setSelectedWeek((prevDate) => addDays(prevDate, 1));
   };
 
-  const selectedDateString = format(selectedDate, 'yyyy-MM-dd');
-
   return (
-    <div className='w-[95%] mx-auto'>
+    <div className='mx-auto'>
       <h2 className='text-2xl font-bold mb-4'>{restaurant.name} 식단</h2>
       {!isMobile ? (
         <>
@@ -170,7 +167,9 @@ const MealCalendar: React.FC<MealCalendarProps> = ({ restaurantId }) => {
             <button
               className='px-4 py-2 bg-blue-500 text-white rounded mr-2'
               onClick={() => {
-                const prevWeek = startOfWeek(addDays(selectedWeek, -7));
+                const prevWeek = startOfWeek(addDays(selectedWeek, -7), {
+                  weekStartsOn: 1,
+                });
                 setSelectedWeek(prevWeek);
               }}
             >
@@ -179,7 +178,9 @@ const MealCalendar: React.FC<MealCalendarProps> = ({ restaurantId }) => {
             <button
               className='px-4 py-2 bg-blue-500 text-white rounded'
               onClick={() => {
-                const nextWeek = startOfWeek(addDays(selectedWeek, 7));
+                const nextWeek = startOfWeek(addDays(selectedWeek, 7), {
+                  weekStartsOn: 1,
+                });
                 setSelectedWeek(nextWeek);
               }}
             >
@@ -220,7 +221,7 @@ const MealCalendar: React.FC<MealCalendarProps> = ({ restaurantId }) => {
               다음날
             </button>
           </div>
-          {renderMealsByDate(selectedDateString)}
+          {renderMealsByDate(format(selectedWeek, 'yyyy-MM-dd'))}
         </div>
       )}
     </div>
