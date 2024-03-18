@@ -80,7 +80,7 @@ devDependencies:
     specifier: ^10.4.16
     version: 10.4.18(postcss@8.4.35)
   eslint:
-    specifier: ^8.56.0
+    specifier: ^8.57.0
     version: 8.57.0
   eslint-config-next:
     specifier: ^14.0.4

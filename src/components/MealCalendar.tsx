@@ -1,114 +1,137 @@
 // @app/components/MealCalendar.tsx
-'use client'
+'use client';
 
-import { addDays, endOfWeek, format, startOfWeek } from 'date-fns'
-import { useEffect, useState } from 'react'
+import { addDays, endOfWeek, format, startOfWeek } from 'date-fns';
+import { ko } from 'date-fns/locale';
+import { useEffect, useState } from 'react';
 
-import { Tables } from '@/lib/database.types'
-import { createClient } from '@/lib/supabase'
+import { Tables } from '@/lib/database.types';
+import { createClient } from '@/lib/supabase';
 
-type Restaurant = Tables<'restaurants'>
-type Meal = Tables<'meals'>
-type MenuItem = Tables<'menuitems'>
+type Restaurant = Tables<'restaurants'>;
+type Meal = Tables<'meals'>;
+type MenuItem = Tables<'menuitems'>;
 
 interface MealCalendarProps {
-  restaurantId: number
+  restaurantId: number;
+}
+
+function mealtypetokorean(mealtype: string) {
+  if (mealtype === 'breakfast') {
+    return '아침';
+  } else if (mealtype === 'lunch') {
+    return '점심';
+  } else if (mealtype === 'dinner') {
+    return '저녁';
+  }
 }
 
 const MealCalendar: React.FC<MealCalendarProps> = ({ restaurantId }) => {
-  const [selectedWeek, setSelectedWeek] = useState(new Date())
-  const [selectedDate, setSelectedDate] = useState(new Date())
-  const [restaurant, setRestaurant] = useState<Restaurant | null>(null)
-  const [meals, setMeals] = useState<Meal[]>([])
-  const [menuItems, setMenuItems] = useState<MenuItem[]>([])
-  const [isMobile, setIsMobile] = useState(false)
+  const [selectedWeek, setSelectedWeek] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
+  const [meals, setMeals] = useState<Meal[]>([]);
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    fetchRestaurant()
-    fetchMealsForWeek(selectedWeek)
-  }, [selectedWeek])
+    const fetchRestaurant = async () => {
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from('restaurants')
+        .select('*')
+        .eq('restaurant_id', restaurantId)
+        .single();
+
+      if (error) {
+        return;
+      }
+
+      setRestaurant(data);
+    };
+
+    const fetchMealsForWeek = async (week: Date) => {
+      const supabase = createClient();
+      const startDate = format(
+        startOfWeek(week, { weekStartsOn: 1 }),
+        'yyyy-MM-dd'
+      );
+      const endDate = format(
+        endOfWeek(week, { weekStartsOn: 1 }),
+        'yyyy-MM-dd'
+      );
+
+      const { data: mealData, error: mealError } = await supabase
+        .from('meals')
+        .select(
+          `
+          *,
+          menuitems (
+            *
+          )
+        `
+        )
+        .eq('restaurant_id', restaurantId)
+        .gte('date', startDate)
+        .lte('date', endDate)
+        .order('meal_type');
+
+      if (mealError) {
+        return;
+      }
+
+      setMeals(mealData || []);
+      setMenuItems(mealData?.flatMap((meal) => meal.menuitems) || []);
+    };
+
+    fetchRestaurant();
+    fetchMealsForWeek(selectedWeek);
+  }, [restaurantId, selectedWeek]);
 
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768) // Adjust the breakpoint as needed
-    }
+      setIsMobile(window.innerWidth <= 768); // Adjust the breakpoint as needed
+    };
 
-    handleResize() // Check initial window size
-    window.addEventListener('resize', handleResize)
+    handleResize(); // Check initial window size
+    window.addEventListener('resize', handleResize);
 
     return () => {
-      window.removeEventListener('resize', handleResize)
-    }
-  }, [])
-
-  const fetchRestaurant = async () => {
-    const supabase = createClient()
-    const { data, error } = await supabase
-      .from('restaurants')
-      .select('*')
-      .eq('restaurant_id', restaurantId)
-      .single()
-
-    if (error) {
-      console.error('Error fetching restaurant:', error)
-      return
-    }
-
-    setRestaurant(data)
-  }
-
-  const fetchMealsForWeek = async (week: Date) => {
-    const supabase = createClient()
-    const startDate = format(startOfWeek(week, { weekStartsOn: 1 }), 'yyyy-MM-dd')
-    const endDate = format(endOfWeek(week, { weekStartsOn: 1 }), 'yyyy-MM-dd')
-
-    const { data: mealData, error: mealError } = await supabase
-      .from('meals')
-      .select(`
-        *,
-        menuitems (
-          *
-        )
-      `)
-      .eq('restaurant_id', restaurantId)
-      .gte('date', startDate)
-      .lte('date', endDate)
-      .order('meal_type')
-
-    if (mealError) {
-      console.error('Error fetching meals:', mealError)
-      return
-    }
-
-    setMeals(mealData || [])
-    setMenuItems(mealData?.flatMap((meal) => meal.menuitems) || [])
-  }
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   const renderMealsByDate = (date: string) => {
-    const mealsForDate = meals.filter((meal) => meal.date === date)
+    const mealsForDate = meals.filter((meal) => meal.date === date);
 
     const groupedMeals = mealsForDate.reduce((acc, meal) => {
-      if (!acc[meal.meal_type!]) {
-        acc[meal.meal_type!] = []
+      if (meal.meal_type) {
+        if (!acc[meal.meal_type]) {
+          acc[meal.meal_type] = [];
+        }
+        acc[meal.meal_type].push(meal);
       }
-      acc[meal.meal_type!].push(meal)
-      return acc
-    }, {} as Record<string, Meal[]>)
+      return acc;
+    }, {} as Record<string, Meal[]>);
 
     return (
       <div>
-        <h3 className="text-xl font-bold mb-2">{format(new Date(date), 'yyyy-MM-dd (EEE)')}</h3>
+        <h3 className='text-xl font-bold mb-2'>
+          {format(new Date(date), 'yyyy-MM-dd(EEE)', { locale: ko })}
+        </h3>
         {['breakfast', 'lunch', 'dinner'].map((mealType) => (
-          <div key={mealType} className="mb-4">
-            <h4 className="text-lg font-bold mb-2">{mealType}</h4>
+          <div key={mealType} className='mb-4'>
+            <h4 className='text-lg font-bold mb-2'>
+              {mealtypetokorean(mealType)}
+            </h4>
             {groupedMeals[mealType]?.map((meal) => (
-              <div key={meal.meal_id} className="border p-4 mb-2">
-                <h5 className="text-md font-bold mb-2">{meal.name}</h5>
-                <ul className="space-y-1">
+              <div key={meal.meal_id} className='border p-4 mb-2'>
+                <h5 className='text-md font-bold mb-2'>{meal.name}</h5>
+                <ul className='space-y-1'>
                   {menuItems
                     .filter((item) => item.meal_id === meal.meal_id)
                     .map((item) => (
-                      <li key={item.menu_item_id} className="text-gray-700">
+                      <li key={item.menu_item_id} className='text-gray-700'>
                         {item.name}
                       </li>
                     ))}
@@ -118,86 +141,90 @@ const MealCalendar: React.FC<MealCalendarProps> = ({ restaurantId }) => {
           </div>
         ))}
       </div>
-    )
-  }
+    );
+  };
 
   if (!restaurant) {
-    return <div>Loading...</div>
+    return <div>로딩중...</div>;
   }
 
-  const startOfWeekDate = startOfWeek(selectedWeek, { weekStartsOn: 1 })
-  const endOfWeekDate = endOfWeek(selectedWeek, { weekStartsOn: 1 })
+  const startOfWeekDate = startOfWeek(selectedWeek, { weekStartsOn: 1 });
+  const endOfWeekDate = endOfWeek(selectedWeek, { weekStartsOn: 1 });
 
   const handlePrevDay = () => {
-    setSelectedDate((prevDate) => addDays(prevDate, -1))
-  }
+    setSelectedDate((prevDate) => addDays(prevDate, -1));
+  };
 
   const handleNextDay = () => {
-    setSelectedDate((prevDate) => addDays(prevDate, 1))
-  }
+    setSelectedDate((prevDate) => addDays(prevDate, 1));
+  };
 
-  const selectedDateString = format(selectedDate, 'yyyy-MM-dd')
+  const selectedDateString = format(selectedDate, 'yyyy-MM-dd');
 
   return (
-    <div className="w-[95%] mx-auto">
-      <h2 className="text-2xl font-bold mb-4">{restaurant.name} Meal Calendar</h2>
+    <div className='w-[95%] mx-auto'>
+      <h2 className='text-2xl font-bold mb-4'>{restaurant.name} 식단</h2>
       {!isMobile ? (
         <>
-          <div className="mb-4">
+          <div className='mb-4'>
             <button
-              className="px-4 py-2 bg-blue-500 text-white rounded mr-2"
+              className='px-4 py-2 bg-blue-500 text-white rounded mr-2'
               onClick={() => {
-                const prevWeek = startOfWeek(addDays(selectedWeek, -7))
-                setSelectedWeek(prevWeek)
+                const prevWeek = startOfWeek(addDays(selectedWeek, -7));
+                setSelectedWeek(prevWeek);
               }}
             >
-              Previous Week
+              이전주
             </button>
             <button
-              className="px-4 py-2 bg-blue-500 text-white rounded"
+              className='px-4 py-2 bg-blue-500 text-white rounded'
               onClick={() => {
-                const nextWeek = startOfWeek(addDays(selectedWeek, 7))
-                setSelectedWeek(nextWeek)
+                const nextWeek = startOfWeek(addDays(selectedWeek, 7));
+                setSelectedWeek(nextWeek);
               }}
             >
-              Next Week
+              다음주
             </button>
           </div>
-          <div className="text-lg font-bold mb-4">
-            Week of {format(startOfWeekDate, 'yyyy-MM-dd')} to {format(endOfWeekDate, 'yyyy-MM-dd')}
+          <div className='text-lg font-bold mb-4'>
+            {format(startOfWeekDate, 'yyyy-MM-dd')} 부터{' '}
+            {format(endOfWeekDate, 'yyyy-MM-dd')} 까지
           </div>
-          <div className="grid grid-cols-7 gap-4">
+          <div className='grid grid-cols-7 gap-4'>
             {Array.from({ length: 7 }).map((_, index) => {
-              const date = format(addDays(startOfWeekDate, index), 'yyyy-MM-dd')
+              const date = format(
+                addDays(startOfWeekDate, index),
+                'yyyy-MM-dd'
+              );
               return (
-                <div key={date} className="border p-4">
+                <div key={date} className='border p-4'>
                   {renderMealsByDate(date)}
                 </div>
-              )
+              );
             })}
           </div>
         </>
       ) : (
-        <div className="border p-4">
-          <div className="flex justify-between items-center mb-4">
+        <div className='border p-4'>
+          <div className='flex justify-between items-center mb-4'>
             <button
-              className="px-4 py-2 bg-blue-500 text-white rounded"
+              className='px-4 py-2 bg-blue-500 text-white rounded'
               onClick={handlePrevDay}
             >
-              Previous Day
+              이전날
             </button>
             <button
-              className="px-4 py-2 bg-blue-500 text-white rounded"
+              className='px-4 py-2 bg-blue-500 text-white rounded'
               onClick={handleNextDay}
             >
-              Next Day
+              다음날
             </button>
           </div>
           {renderMealsByDate(selectedDateString)}
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default MealCalendar
+export default MealCalendar;
