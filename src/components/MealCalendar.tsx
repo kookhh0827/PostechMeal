@@ -1,0 +1,203 @@
+// @app/components/MealCalendar.tsx
+'use client'
+
+import { addDays, endOfWeek, format, startOfWeek } from 'date-fns'
+import { useEffect, useState } from 'react'
+
+import { Tables } from '@/lib/database.types'
+import { createClient } from '@/lib/supabase'
+
+type Restaurant = Tables<'restaurants'>
+type Meal = Tables<'meals'>
+type MenuItem = Tables<'menuitems'>
+
+interface MealCalendarProps {
+  restaurantId: number
+}
+
+const MealCalendar: React.FC<MealCalendarProps> = ({ restaurantId }) => {
+  const [selectedWeek, setSelectedWeek] = useState(new Date())
+  const [selectedDate, setSelectedDate] = useState(new Date())
+  const [restaurant, setRestaurant] = useState<Restaurant | null>(null)
+  const [meals, setMeals] = useState<Meal[]>([])
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([])
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    fetchRestaurant()
+    fetchMealsForWeek(selectedWeek)
+  }, [selectedWeek])
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768) // Adjust the breakpoint as needed
+    }
+
+    handleResize() // Check initial window size
+    window.addEventListener('resize', handleResize)
+
+    return () => {
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [])
+
+  const fetchRestaurant = async () => {
+    const supabase = createClient()
+    const { data, error } = await supabase
+      .from('restaurants')
+      .select('*')
+      .eq('restaurant_id', restaurantId)
+      .single()
+
+    if (error) {
+      console.error('Error fetching restaurant:', error)
+      return
+    }
+
+    setRestaurant(data)
+  }
+
+  const fetchMealsForWeek = async (week: Date) => {
+    const supabase = createClient()
+    const startDate = format(startOfWeek(week, { weekStartsOn: 1 }), 'yyyy-MM-dd')
+    const endDate = format(endOfWeek(week, { weekStartsOn: 1 }), 'yyyy-MM-dd')
+
+    const { data: mealData, error: mealError } = await supabase
+      .from('meals')
+      .select(`
+        *,
+        menuitems (
+          *
+        )
+      `)
+      .eq('restaurant_id', restaurantId)
+      .gte('date', startDate)
+      .lte('date', endDate)
+      .order('meal_type')
+
+    if (mealError) {
+      console.error('Error fetching meals:', mealError)
+      return
+    }
+
+    setMeals(mealData || [])
+    setMenuItems(mealData?.flatMap((meal) => meal.menuitems) || [])
+  }
+
+  const renderMealsByDate = (date: string) => {
+    const mealsForDate = meals.filter((meal) => meal.date === date)
+
+    const groupedMeals = mealsForDate.reduce((acc, meal) => {
+      if (!acc[meal.meal_type!]) {
+        acc[meal.meal_type!] = []
+      }
+      acc[meal.meal_type!].push(meal)
+      return acc
+    }, {} as Record<string, Meal[]>)
+
+    return (
+      <div>
+        <h3 className="text-xl font-bold mb-2">{format(new Date(date), 'yyyy-MM-dd (EEE)')}</h3>
+        {['breakfast', 'lunch', 'dinner'].map((mealType) => (
+          <div key={mealType} className="mb-4">
+            <h4 className="text-lg font-bold mb-2">{mealType}</h4>
+            {groupedMeals[mealType]?.map((meal) => (
+              <div key={meal.meal_id} className="border p-4 mb-2">
+                <h5 className="text-md font-bold mb-2">{meal.name}</h5>
+                <ul className="space-y-1">
+                  {menuItems
+                    .filter((item) => item.meal_id === meal.meal_id)
+                    .map((item) => (
+                      <li key={item.menu_item_id} className="text-gray-700">
+                        {item.name}
+                      </li>
+                    ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    )
+  }
+
+  if (!restaurant) {
+    return <div>Loading...</div>
+  }
+
+  const startOfWeekDate = startOfWeek(selectedWeek, { weekStartsOn: 1 })
+  const endOfWeekDate = endOfWeek(selectedWeek, { weekStartsOn: 1 })
+
+  const handlePrevDay = () => {
+    setSelectedDate((prevDate) => addDays(prevDate, -1))
+  }
+
+  const handleNextDay = () => {
+    setSelectedDate((prevDate) => addDays(prevDate, 1))
+  }
+
+  const selectedDateString = format(selectedDate, 'yyyy-MM-dd')
+
+  return (
+    <div className="w-[95%] mx-auto">
+      <h2 className="text-2xl font-bold mb-4">{restaurant.name} Meal Calendar</h2>
+      {!isMobile ? (
+        <>
+          <div className="mb-4">
+            <button
+              className="px-4 py-2 bg-blue-500 text-white rounded mr-2"
+              onClick={() => {
+                const prevWeek = startOfWeek(addDays(selectedWeek, -7))
+                setSelectedWeek(prevWeek)
+              }}
+            >
+              Previous Week
+            </button>
+            <button
+              className="px-4 py-2 bg-blue-500 text-white rounded"
+              onClick={() => {
+                const nextWeek = startOfWeek(addDays(selectedWeek, 7))
+                setSelectedWeek(nextWeek)
+              }}
+            >
+              Next Week
+            </button>
+          </div>
+          <div className="text-lg font-bold mb-4">
+            Week of {format(startOfWeekDate, 'yyyy-MM-dd')} to {format(endOfWeekDate, 'yyyy-MM-dd')}
+          </div>
+          <div className="grid grid-cols-7 gap-4">
+            {Array.from({ length: 7 }).map((_, index) => {
+              const date = format(addDays(startOfWeekDate, index), 'yyyy-MM-dd')
+              return (
+                <div key={date} className="border p-4">
+                  {renderMealsByDate(date)}
+                </div>
+              )
+            })}
+          </div>
+        </>
+      ) : (
+        <div className="border p-4">
+          <div className="flex justify-between items-center mb-4">
+            <button
+              className="px-4 py-2 bg-blue-500 text-white rounded"
+              onClick={handlePrevDay}
+            >
+              Previous Day
+            </button>
+            <button
+              className="px-4 py-2 bg-blue-500 text-white rounded"
+              onClick={handleNextDay}
+            >
+              Next Day
+            </button>
+          </div>
+          {renderMealsByDate(selectedDateString)}
+        </div>
+      )}
+    </div>
+  )
+}
+
+export default MealCalendar
