@@ -78,9 +78,9 @@ const OrderCalendar: React.FC<OrderCalendarProps> = ({ restaurantId }) => {
     return (
       <div className='mb-6'>
         <h4 className='text-lg font-bold mb-2'>{mealtypetokorean(mealType)}</h4>
-        <div className='space-y-4 md:space-y-0 md:flex md:space-x-4'>
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4'>
           {filteredOrders.map((order) => (
-            <div key={order.id} className='border p-4'>
+            <div key={order.order_id} className='border p-4'>
               <h5 className='text-md font-bold mb-2'>{order.name}</h5>
               <p className='text-gray-600'>{order.description}</p>
               <p className='mt-2'>가격: {order.price}</p>

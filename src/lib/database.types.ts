@@ -77,9 +77,9 @@ export type Database = {
         Row: {
           description: string | null;
           end_date: string | null;
-          id: number;
           meal_type: string | null;
           name: string | null;
+          order_id: number;
           price: number | null;
           restaurant_id: number | null;
           start_date: string | null;
@@ -87,9 +87,9 @@ export type Database = {
         Insert: {
           description?: string | null;
           end_date?: string | null;
-          id?: number;
           meal_type?: string | null;
           name?: string | null;
+          order_id?: number;
           price?: number | null;
           restaurant_id?: number | null;
           start_date?: string | null;
@@ -97,9 +97,9 @@ export type Database = {
         Update: {
           description?: string | null;
           end_date?: string | null;
-          id?: number;
           meal_type?: string | null;
           name?: string | null;
+          order_id?: number;
           price?: number | null;
           restaurant_id?: number | null;
           start_date?: string | null;
@@ -128,6 +128,7 @@ export type Database = {
           serving_breakfast: boolean | null;
           serving_dinner: boolean | null;
           serving_lunch: boolean | null;
+          type: string | null;
         };
         Insert: {
           breakfast_end_time?: string | null;
@@ -142,6 +143,7 @@ export type Database = {
           serving_breakfast?: boolean | null;
           serving_dinner?: boolean | null;
           serving_lunch?: boolean | null;
+          type?: string | null;
         };
         Update: {
           breakfast_end_time?: string | null;
@@ -156,6 +158,7 @@ export type Database = {
           serving_breakfast?: boolean | null;
           serving_dinner?: boolean | null;
           serving_lunch?: boolean | null;
+          type?: string | null;
         };
         Relationships: [];
       };

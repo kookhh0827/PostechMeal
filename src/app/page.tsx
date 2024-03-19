@@ -1,20 +1,38 @@
 'use client';
 // src/page.tsx
 import * as React from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import '@/lib/env';
+
+import { createClient } from '@/lib/supabase';
 
 import MealCalendar from '@/components/MealCalendar';
 import OrderCalendar from '@/components/OrderCalander';
 
 export default function HomePage() {
-  const [selectedRestaurant, setSelectedRestaurant] = useState<number>(1);
+  const [selectedRestaurant, setSelectedRestaurant] = useState<number | null>(
+    null
+  );
+  const [restaurants, setRestaurants] = useState<
+    { restaurant_id: number; name: string; type: string }[]
+  >([]);
 
-  const restaurants = [
-    { id: 1, name: '학생식당', type: 'meal' },
-    { id: 2, name: 'RIST식당', type: 'meal' },
-    { id: 3, name: '해동-아우름홀', type: 'order' },
-  ];
+  useEffect(() => {
+    fetchRestaurants();
+  }, []);
+
+  const fetchRestaurants = async () => {
+    const supabase = createClient();
+
+    const { data, error } = await supabase
+      .from('restaurants')
+      .select('restaurant_id, name, type');
+
+    if (!error) {
+      setRestaurants(data || []);
+      setSelectedRestaurant(data?.[0]?.restaurant_id || null);
+    }
+  };
 
   const handleRestaurantClick = (restaurantId: number) => {
     setSelectedRestaurant(restaurantId);
@@ -26,11 +44,13 @@ export default function HomePage() {
         <ul className='flex space-x-4'>
           {restaurants.map((restaurant) => (
             <li
-              key={restaurant.id}
+              key={restaurant.restaurant_id}
               className={`cursor-pointer ${
-                selectedRestaurant === restaurant.id ? 'font-bold' : ''
+                selectedRestaurant === restaurant.restaurant_id
+                  ? 'font-bold'
+                  : ''
               }`}
-              onClick={() => handleRestaurantClick(restaurant.id)}
+              onClick={() => handleRestaurantClick(restaurant.restaurant_id)}
             >
               {restaurant.name}
             </li>
@@ -41,7 +61,7 @@ export default function HomePage() {
         {selectedRestaurant && (
           <div>
             {restaurants.find(
-              (restaurant) => restaurant.id === selectedRestaurant
+              (restaurant) => restaurant.restaurant_id === selectedRestaurant
             )?.type === 'meal' ? (
               <MealCalendar restaurantId={selectedRestaurant} />
             ) : (
