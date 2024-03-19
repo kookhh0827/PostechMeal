@@ -16,6 +16,7 @@ export type Database = {
           meal_id: number;
           meal_type: string | null;
           name: string;
+          price: number | null;
           restaurant_id: number | null;
         };
         Insert: {
@@ -24,6 +25,7 @@ export type Database = {
           meal_id?: number;
           meal_type?: string | null;
           name: string;
+          price?: number | null;
           restaurant_id?: number | null;
         };
         Update: {
@@ -32,6 +34,7 @@ export type Database = {
           meal_id?: number;
           meal_type?: string | null;
           name?: string;
+          price?: number | null;
           restaurant_id?: number | null;
         };
         Relationships: [

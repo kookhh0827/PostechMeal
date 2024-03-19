@@ -135,6 +135,7 @@ const MealCalendar: React.FC<MealCalendarProps> = ({ restaurantId }) => {
                       </li>
                     ))}
                 </ul>
+                <p className='mt-2'>가격: {meal.price}</p>
               </div>
             ))}
           </div>
