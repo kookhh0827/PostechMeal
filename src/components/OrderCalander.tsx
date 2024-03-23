@@ -1,11 +1,10 @@
-// @app/components/OrderCalendar.tsx
 'use client';
 
 import { format, isWithinInterval, parseISO } from 'date-fns';
 import { useEffect, useState } from 'react';
 
 import { Tables } from '@/lib/database.types';
-import { createClient } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/client';
 
 type Restaurant = Tables<'restaurants'>;
 type Order = Tables<'orders'>;

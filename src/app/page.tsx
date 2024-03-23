@@ -4,7 +4,7 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import '@/lib/env';
 
-import { createClient } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/client';
 
 import MealCalendar from '@/components/MealCalendar';
 import OrderCalendar from '@/components/OrderCalander';

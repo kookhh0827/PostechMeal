@@ -1,4 +1,3 @@
-// @app/components/MealCalendar.tsx
 'use client';
 
 import { addDays, endOfWeek, format, startOfWeek } from 'date-fns';
@@ -6,7 +5,7 @@ import { ko } from 'date-fns/locale';
 import { useEffect, useState } from 'react';
 
 import { Tables } from '@/lib/database.types';
-import { createClient } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/client';
 
 type Restaurant = Tables<'restaurants'>;
 type Meal = Tables<'meals'>;

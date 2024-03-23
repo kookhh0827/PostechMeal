@@ -3,6 +3,14 @@ const nextConfig = {
   eslint: {
     dirs: ['src'],
   },
+  experimental: {
+    serverActions: {
+      allowedOrigins: [
+        'bookish-halibut-w5rrqjxjp6xc57rw-3000.app.github.dev',
+        'localhost:3000',
+      ],
+    },
+  },
 
   reactStrictMode: true,
   swcMinify: true,
