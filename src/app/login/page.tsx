@@ -92,7 +92,7 @@ export default function LoginPage() {
               className={`w-full px-3 py-2 border ${
                 emailError ? 'border-red-500' : 'border-gray-300'
               } rounded focus:outline-none focus:border-blue-500`}
-              placeholder='Enter your email'
+              placeholder='이메일 입력'
               value={email}
               onChange={handleEmailChange}
             />
@@ -114,7 +114,7 @@ export default function LoginPage() {
               className={`w-full px-3 py-2 border ${
                 passwordError ? 'border-red-500' : 'border-gray-300'
               } rounded focus:outline-none focus:border-blue-500`}
-              placeholder='Enter your password'
+              placeholder='패스워드 입력'
               value={password}
               onChange={handlePasswordChange}
             />
