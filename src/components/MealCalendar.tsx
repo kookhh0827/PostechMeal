@@ -160,7 +160,7 @@ const MealCalendar: React.FC<MealCalendarProps> = ({ restaurantId }) => {
 
   return (
     <div className='mx-auto'>
-      <h2 className='text-2xl font-bold mb-4'>{restaurant.name} 식단</h2>
+      {/* {<h2 className='text-2xl font-bold mb-4'>{restaurant.name} 식단</h2>} */}
       {!isMobile ? (
         <>
           <div className='mb-4'>

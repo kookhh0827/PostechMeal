@@ -96,7 +96,7 @@ const OrderCalendar: React.FC<OrderCalendarProps> = ({ restaurantId }) => {
 
   return (
     <div className='mx-auto'>
-      <h2 className='text-2xl font-bold mb-4'>{restaurant.name} 메뉴</h2>
+      {/* {<h2 className='text-2xl font-bold mb-4'>{restaurant.name} 메뉴</h2>} */}
       <div className='mb-4'>
         <label htmlFor='date' className='block mb-2 font-bold'>
           날짜 선택
@@ -110,9 +110,9 @@ const OrderCalendar: React.FC<OrderCalendarProps> = ({ restaurantId }) => {
         />
       </div>
       {/* <h3 className="text-xl font-bold mb-4">{format(selectedDate, 'yyyy-MM-dd (EEE)')}</h3> */}
-      {renderOrdersByMealType('breakfast')}
-      {renderOrdersByMealType('lunch')}
-      {renderOrdersByMealType('dinner')}
+      {restaurant.serving_breakfast && renderOrdersByMealType('breakfast')}
+      {restaurant.serving_lunch && renderOrdersByMealType('lunch')}
+      {restaurant.serving_dinner && renderOrdersByMealType('dinner')}
     </div>
   );
 };
