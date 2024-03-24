@@ -12,6 +12,7 @@
 
 - ⚡️ Next.js 14 with App Router
 - ⚛️ React 18
+- 🛢️ Supabase and Supabase.js — Database SaaS and framework
 - ✨ TypeScript
 - 💨 Tailwind CSS 3 — Configured with CSS Variables to extend the **primary** color
 - 🃏 Jest — Configured for unit testing
@@ -48,11 +49,11 @@ pnpm install
 pnpm dev
 ```
 
-[http://localhost:3000](http://localhost:3000) 에서 서버가 작동합니다.
+[http://localhost:3000](http://localhost:3000) 에서 작동하는 서버를 확인하실 수 있습니다.
 
 ### 4. Commit Message Convention
 
-이 프로젝트는 [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) 해당 Commit Convention을 따릅니다.
+이 프로젝트는 다음 Commit Convention을 따릅니다. [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/)
 
 ## 로드맵
 
