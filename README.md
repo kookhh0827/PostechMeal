@@ -1,133 +1,68 @@
-# Next.js + Tailwind CSS + TypeScript Starter and Boilerplate
+# 포스텍 식당 정보 사이트 프로젝트
 
-<div align="center">
-  <h2>🔋 ts-nextjs-tailwind-starter</h2>
-  <p>Next.js + Tailwind CSS + TypeScript starter packed with useful development features.</p>
-  <p>Made by <a href="https://theodorusclarence.com">Theodorus Clarence</a></p>
+![Main Image](public/favicon/android-chrome-512x512.png)
 
-[![GitHub Repo stars](https://img.shields.io/github/stars/theodorusclarence/ts-nextjs-tailwind-starter)](https://github.com/theodorusclarence/ts-nextjs-tailwind-starter/stargazers)
-[![Depfu](https://badges.depfu.com/badges/fc6e730632ab9dacaf7df478a08684a7/overview.svg)](https://depfu.com/github/theodorusclarence/ts-nextjs-tailwind-starter?project_id=30160)
-[![Last Update](https://img.shields.io/badge/deps%20update-every%20sunday-blue.svg)](https://shields.io/)
+## 프로젝트 소개
 
-</div>
+이 프로젝트는 오픈 소스로 진행되며, 포스텍 내의 식당 정보를 한 곳에 모으기 위해 시작되었습니다. 포스텍 구성원의 알찬 메뉴 선정에 도움을 주는 것이 목표입니다. 식당 리뷰, 메뉴 리뷰, 커뮤니티 기능을 등을 통해서 건전한 학내 식문화 확산을 추구하고자 합니다. 이 프로젝트의 개발 및 기획에 참여하고 싶으신 분은 누구든지 환영입니다.
 
-## Features
+## 기술 스택
 
-This repository is 🔋 battery packed with:
+이 프로젝트의 주요한 기술 스택은 다음과 같습니다.
 
 - ⚡️ Next.js 14 with App Router
 - ⚛️ React 18
 - ✨ TypeScript
 - 💨 Tailwind CSS 3 — Configured with CSS Variables to extend the **primary** color
-- 💎 Pre-built Components — Components that will **automatically adapt** with your brand color, [check here for the demo](https://tsnext-tw.thcl.dev/components)
 - 🃏 Jest — Configured for unit testing
-- 📈 Absolute Import and Path Alias — Import components using `@/` prefix
 - 📏 ESLint — Find and fix problems in your code, also will **auto sort** your imports
 - 💖 Prettier — Format your code consistently
 - 🐶 Husky & Lint Staged — Run scripts on your staged files before they are committed
 - 🤖 Conventional Commit Lint — Make sure you & your teammates follow conventional commit
-- ⏰ Release Please — Generate your changelog by activating the `release-please` workflow
-- 👷 Github Actions — Lint your code on PR
-- 🚘 Automatic Branch and Issue Autolink — Branch will be automatically created on issue **assign**, and auto linked on PR
-- 🔥 Snippets — A collection of useful snippets
-- 👀 Open Graph Helper Function — Awesome open graph generated using [og](https://github.com/theodorusclarence/og), fork it and deploy!
-- 🗺 Site Map — Automatically generate sitemap.xml
-- 📦 Expansion Pack — Easily install common libraries, additional components, and configs.
 
-See the 👉 [feature details and changelog](https://github.com/theodorusclarence/ts-nextjs-tailwind-starter/blob/main/CHANGELOG.md) 👈 for more.
+## 시작하기
 
-You can also check all of the **details and demos** on my blog post:
+### 1. Repository 클론 및 배포
 
-- [One-stop Starter to Maximize Efficiency on Next.js & Tailwind CSS Projects](https://theodorusclarence.com/blog/one-stop-starter)
-
-## Getting Started
-
-### 1. Clone this template using one of the three ways
-
-1. Use this repository as template
-
-   **Disclosure:** by using this repository as a template, there will be an attribution on your repository.
-
-   I'll appreciate if you do, so this template can be known by others too 😄
+1. 이 Repository를 클론
 
    ![Use as template](https://user-images.githubusercontent.com/55318172/129183039-1a61e68d-dd90-4548-9489-7b3ccbb35810.png)
 
-2. Using `create-next-app`
+2. Vercel을 통해 Deploy
 
-   ```bash
-   pnpm create next-app  -e https://github.com/theodorusclarence/ts-nextjs-tailwind-starter ts-pnpm
-   ```
+   [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https://github.com/kookhh0827/PostechMeal)
 
-   If you still want to use **pages directory** (_is not actively maintained_) you can use this command
+### 2. Dependencies 설치
 
-   ```bash
-   npx create-next-app -e https://github.com/theodorusclarence/ts-nextjs-tailwind-starter/tree/pages-directory project-name
-   ```
-
-3. Using `degit`
-
-   ```bash
-   npx degit theodorusclarence/ts-nextjs-tailwind-starter YOUR_APP_NAME
-   ```
-
-4. Deploy to Vercel
-
-   [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https%3A%2F%2Fgithub.com%2Ftheodorusclarence%2Fts-nextjs-tailwind-starter)
-
-### 2. Install dependencies
-
-It is encouraged to use **pnpm** so the husky hooks can work properly.
+**pnpm** 을 사용하시는 것을 추천합니다.
 
 ```bash
 pnpm install
 ```
 
-### 3. Run the development server
+### 3. Local에서 Development 서버 테스트
 
-You can start the server using this command:
+다음 커맨드로 local 환경에서 테스트할 수 있습니다.
 
 ```bash
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result. You can start editing the page by modifying `src/pages/index.tsx`.
+[http://localhost:3000](http://localhost:3000) 에서 서버가 작동합니다.
 
-### 4. Change defaults
+### 4. Commit Message Convention
 
-There are some things you need to change including title, urls, favicons, etc.
+이 프로젝트는 [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) 해당 Commit Convention을 따릅니다.
 
-Find all comments with !STARTERCONF, then follow the guide.
+## 로드맵
 
-Don't forget to change the package name in package.json
+- [x] 로그인, 로그아웃 기능 구현
+- [x] 식당 별 댓글 및 좋아요 기능 구현
+- [ ] 식당 별 대댓글 기능, 수정 및 삭제 기능 구현
+- [ ] 고정 메뉴 리뷰 기능 구현
+- [ ] 식단표 메뉴 아이템화 및 평가 기능 구현
+- [ ] 회원 정보 수정 기능 구현
 
-### 5. Commit Message Convention
+## 문의 및 제안
 
-This starter is using [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/), it is mandatory to use it to commit changes.
-
-## Projects using ts-nextjs-tailwind-starter
-
-<!--
-TEMPLATE
-- [sitename](https://sitelink.com) ([Source](https://github.com/githublink))
-- [sitename](https://sitelink.com)
--->
-
-- [theodorusclarence.com](https://theodorusclarence.com) ([Source](https://github.com/theodorusclarence/theodorusclarence.com))
-- [Notiolink](https://notiolink.thcl.dev/) ([Source](https://github.com/theodorusclarence/notiolink))
-- [NextJs + Materia UI + Typescript](https://github.com/AlexStack/nextjs-materia-mui-typescript-hook-form-scaffold-boilerplate-starter)
-
-Are you using this starter? Please add your page (and repo) to the end of the list via a [Pull Request](https://github.com/theodorusclarence/ts-nextjs-tailwind-starter/edit/main/README.md). 😃
-
-## Expansion Pack 📦
-
-This starter is now equipped with an [expansion pack](https://github.com/theodorusclarence/expansion-pack).
-
-You can easily add expansion such as React Hook Form + Components, Storybook, and more just using a single command line.
-
-<https://user-images.githubusercontent.com/55318172/146631994-e1cac137-1664-4cfe-950b-a96decc1eaa6.mp4>
-
-Check out the [expansion pack repository](https://github.com/theodorusclarence/expansion-pack) for the commands
-
-### App Router Update
-
-Due to App Router update, the expansion pack is currently **outdated**. It will be updated in the future. You can still use them by copy and pasting the files.
+개발에 합류하고 싶거나, 제안하실 사항이 있는 경우 kookhh0827@postech.ac.kr 로 메일 바랍니다.
