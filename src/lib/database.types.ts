@@ -29,6 +29,45 @@ export type Database = {
           {
             foreignKeyName: 'public_accounts_users_id_fkey';
             columns: ['users_id'];
+            isOneToOne: true;
+            referencedRelation: 'users';
+            referencedColumns: ['id'];
+          }
+        ];
+      };
+      comments: {
+        Row: {
+          comment_id: number;
+          created_at: string;
+          message: string | null;
+          restaurant_id: number | null;
+          users_id: string | null;
+        };
+        Insert: {
+          comment_id?: number;
+          created_at?: string;
+          message?: string | null;
+          restaurant_id?: number | null;
+          users_id?: string | null;
+        };
+        Update: {
+          comment_id?: number;
+          created_at?: string;
+          message?: string | null;
+          restaurant_id?: number | null;
+          users_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'public_comments_restaurant_id_fkey';
+            columns: ['restaurant_id'];
+            isOneToOne: false;
+            referencedRelation: 'restaurants';
+            referencedColumns: ['restaurant_id'];
+          },
+          {
+            foreignKeyName: 'public_comments_users_id_fkey';
+            columns: ['users_id'];
             isOneToOne: false;
             referencedRelation: 'users';
             referencedColumns: ['id'];
@@ -191,12 +230,83 @@ export type Database = {
         };
         Relationships: [];
       };
+      users_like_comments: {
+        Row: {
+          comment_id: number;
+          users_id: string;
+        };
+        Insert: {
+          comment_id: number;
+          users_id?: string;
+        };
+        Update: {
+          comment_id?: number;
+          users_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'public_users_like_comments_comment_id_fkey';
+            columns: ['comment_id'];
+            isOneToOne: false;
+            referencedRelation: 'comments';
+            referencedColumns: ['comment_id'];
+          },
+          {
+            foreignKeyName: 'public_users_like_comments_comment_id_fkey';
+            columns: ['comment_id'];
+            isOneToOne: false;
+            referencedRelation: 'comments_with_nickname';
+            referencedColumns: ['comment_id'];
+          },
+          {
+            foreignKeyName: 'public_users_like_comments_users_id_fkey';
+            columns: ['users_id'];
+            isOneToOne: false;
+            referencedRelation: 'users';
+            referencedColumns: ['id'];
+          }
+        ];
+      };
     };
     Views: {
-      [_ in never]: never;
+      comments_with_nickname: {
+        Row: {
+          comment_id: number | null;
+          created_at: string | null;
+          like_count: number | null;
+          liked_by_current_user: boolean | null;
+          message: string | null;
+          nickname: string | null;
+          restaurant_id: number | null;
+          users_id: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'public_comments_restaurant_id_fkey';
+            columns: ['restaurant_id'];
+            isOneToOne: false;
+            referencedRelation: 'restaurants';
+            referencedColumns: ['restaurant_id'];
+          },
+          {
+            foreignKeyName: 'public_comments_users_id_fkey';
+            columns: ['users_id'];
+            isOneToOne: false;
+            referencedRelation: 'users';
+            referencedColumns: ['id'];
+          }
+        ];
+      };
     };
     Functions: {
-      [_ in never]: never;
+      check_nickname_exists: {
+        Args: {
+          p_nickname: string;
+        };
+        Returns: {
+          nickname: string;
+        }[];
+      };
     };
     Enums: {
       [_ in never]: never;

@@ -18,7 +18,7 @@ export default function LoginPage() {
 
   const validateEmail = (value: string) => {
     if (!value) {
-      setEmailError('Email is required');
+      setEmailError('이메일을 입력 해주세요');
       return false;
     } else {
       setEmailError('');
@@ -28,7 +28,7 @@ export default function LoginPage() {
 
   const validatePassword = (value: string) => {
     if (!value) {
-      setPasswordError('Password is required');
+      setPasswordError('패스워드를 입력 해주세요');
       return false;
     } else {
       setPasswordError('');
@@ -75,7 +75,7 @@ export default function LoginPage() {
 
   return (
     <div className='min-h-screen flex items-center justify-center bg-gray-100'>
-      <div className='bg-white p-8 rounded-lg shadow-md w-full max-w-md'>
+      <div className='bg-white p-8 rounded-lg shadow-md w-full max-w-[95%] md:max-w-md'>
         <h2 className='text-2xl font-bold mb-6'>로그인</h2>
         <form onSubmit={handleSubmit}>
           <div className='mb-4'>
