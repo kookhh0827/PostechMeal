@@ -97,6 +97,29 @@ const OrderCalendar: React.FC<OrderCalendarProps> = ({ restaurantId }) => {
   return (
     <div className='mx-auto'>
       {/* {<h2 className='text-2xl font-bold mb-4'>{restaurant.name} 메뉴</h2>} */}
+      {restaurant.location && (
+        <p className='text-lg mb-4'>위치: {restaurant.location}</p>
+      )}
+      <div className='mb-4'>
+        {restaurant.serving_breakfast && (
+          <p>
+            아침 식사 시간: {restaurant.breakfast_start_time} -{' '}
+            {restaurant.breakfast_end_time}
+          </p>
+        )}
+        {restaurant.serving_lunch && (
+          <p>
+            점심 식사 시간: {restaurant.lunch_start_time} -{' '}
+            {restaurant.lunch_end_time}
+          </p>
+        )}
+        {restaurant.serving_dinner && (
+          <p>
+            저녁 식사 시간: {restaurant.dinner_start_time} -{' '}
+            {restaurant.dinner_end_time}
+          </p>
+        )}
+      </div>
       <div className='mb-4'>
         <label htmlFor='date' className='block mb-2 font-bold'>
           날짜 선택
