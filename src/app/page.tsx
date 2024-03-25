@@ -125,8 +125,8 @@ export default function HomePage() {
     if (comment.length < 5 || comment.length > 100) {
       Swal.fire({
         icon: 'warning',
-        title: '댓글 길이 제한',
-        text: '댓글 길이는 5글자 이상 100글자 이하로 제한되어 있습니다.',
+        title: '리뷰 길이 제한',
+        text: '리뷰 길이는 5글자 이상 100글자 이하로 제한되어 있습니다.',
       });
       return;
     }
@@ -206,7 +206,7 @@ export default function HomePage() {
               <OrderCalendar restaurantId={selectedRestaurant} />
             )}
             <div className='flex justify-between items-center mb-4 mt-4'>
-              <h3 className='text-lg font-semibold'>댓글 목록</h3>
+              <h3 className='text-lg font-semibold'>리뷰 목록</h3>
               <select
                 value={selectedOrdering}
                 onChange={(e) =>
