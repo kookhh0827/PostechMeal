@@ -18,9 +18,19 @@ export async function login(formData: FormData) {
   const { error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
+    let error_message = '';
+    if (error.message === 'Invalid login credentials') {
+      error_message = '이메일 혹은 패스워드를 확인 해주세요';
+    } else if (error.message === 'Email not confirmed') {
+      error_message =
+        '이메일 인증 후 로그인 해주세요. 이메일이 오지 않았을 경우 문의 부탁드립니다.';
+    } else {
+      error_message = '알 수 없는 오류가 발생했습니다.';
+    }
+
     return {
       message: null,
-      error: '로그인 실패. 이메일이나 패스워드를 확인 해주세요.',
+      error: error_message,
     };
   }
 
