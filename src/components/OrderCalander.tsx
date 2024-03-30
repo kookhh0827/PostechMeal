@@ -1,6 +1,5 @@
 'use client';
 
-import { QueryData } from '@supabase/supabase-js';
 import { format, isWithinInterval, parseISO } from 'date-fns';
 import { useEffect, useState } from 'react';
 
@@ -8,6 +7,12 @@ import { Tables } from '@/lib/database.types';
 import { createClient } from '@/lib/supabase/client';
 
 type Restaurant = Tables<'restaurants'>;
+type Order = Tables<'orders'>;
+type OrderItem = Tables<'orderitem'>;
+
+interface OrderWithOrderItem extends Order {
+  orderitem: OrderItem;
+}
 
 interface OrderCalendarProps {
   restaurantId: number;
@@ -26,6 +31,7 @@ function mealtypetokorean(mealtype: string) {
 const OrderCalendar: React.FC<OrderCalendarProps> = ({ restaurantId }) => {
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [orders, setOrders] = useState<OrderWithOrderItem[] | null>(null);
 
   useEffect(() => {
     const fetchRestaurant = async () => {
@@ -43,29 +49,30 @@ const OrderCalendar: React.FC<OrderCalendarProps> = ({ restaurantId }) => {
       setRestaurant(data);
     };
 
+    const fetchOrders = async () => {
+      const supabase = createClient();
+      const ordersQuery = supabase
+        .from('orders')
+        .select('*, orderitem(name, description)')
+        .eq('restaurant_id', restaurantId);
+
+      const { data, error } = await ordersQuery;
+      if (error) {
+        throw error;
+      }
+
+      setOrders(data as OrderWithOrderItem[]);
+    };
+
     fetchRestaurant();
+    fetchOrders();
   }, [restaurantId]);
 
-  const fetchOrders = async () => {
-    const supabase = createClient();
-    const ordersQuery = supabase
-      .from('orders')
-      .select('*, orderitem(name, description)')
-      .eq('restaurant_id', restaurantId);
-
-    type OrdersWithOrderItem = QueryData<typeof ordersQuery>;
-
-    const { data, error } = await ordersQuery;
-    if (error) {
-      throw error;
+  const renderOrdersByMealType = (mealType: string) => {
+    if (!orders) {
+      return null;
     }
 
-    const orders: OrdersWithOrderItem = data;
-    return orders;
-  };
-
-  const renderOrdersByMealType = async (mealType: string) => {
-    const orders = await fetchOrders();
     const filteredOrders = orders.filter(
       (order) =>
         order.meal_type === mealType &&
@@ -99,7 +106,6 @@ const OrderCalendar: React.FC<OrderCalendarProps> = ({ restaurantId }) => {
 
   return (
     <div className='mx-auto'>
-      {/* {<h2 className='text-2xl font-bold mb-4'>{restaurant.name} 메뉴</h2>} */}
       {restaurant.location && (
         <p className='text-lg mb-4'>위치: {restaurant.location}</p>
       )}
@@ -135,7 +141,6 @@ const OrderCalendar: React.FC<OrderCalendarProps> = ({ restaurantId }) => {
           className='border border-gray-300 rounded px-2 py-1'
         />
       </div>
-      {/* <h3 className="text-xl font-bold mb-4">{format(selectedDate, 'yyyy-MM-dd (EEE)')}</h3> */}
       {restaurant.serving_breakfast && renderOrdersByMealType('breakfast')}
       {restaurant.serving_lunch && renderOrdersByMealType('lunch')}
       {restaurant.serving_dinner && renderOrdersByMealType('dinner')}
