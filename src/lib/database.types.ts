@@ -13,17 +13,17 @@ export type Database = {
         Row: {
           account_id: number;
           nickname: string | null;
-          users_id: string | null;
+          users_id: string;
         };
         Insert: {
           account_id?: number;
           nickname?: string | null;
-          users_id?: string | null;
+          users_id: string;
         };
         Update: {
           account_id?: number;
           nickname?: string | null;
-          users_id?: string | null;
+          users_id?: string;
         };
         Relationships: [
           {
@@ -141,6 +141,27 @@ export type Database = {
           }
         ];
       };
+      orderitem: {
+        Row: {
+          description: string | null;
+          name: string | null;
+          orderitem_id: number;
+          thumbnail_url: string | null;
+        };
+        Insert: {
+          description?: string | null;
+          name?: string | null;
+          orderitem_id?: number;
+          thumbnail_url?: string | null;
+        };
+        Update: {
+          description?: string | null;
+          name?: string | null;
+          orderitem_id?: number;
+          thumbnail_url?: string | null;
+        };
+        Relationships: [];
+      };
       orders: {
         Row: {
           description: string | null;
@@ -148,6 +169,7 @@ export type Database = {
           meal_type: string | null;
           name: string | null;
           order_id: number;
+          orderitem_id: number | null;
           price: number | null;
           restaurant_id: number | null;
           start_date: string | null;
@@ -158,6 +180,7 @@ export type Database = {
           meal_type?: string | null;
           name?: string | null;
           order_id?: number;
+          orderitem_id?: number | null;
           price?: number | null;
           restaurant_id?: number | null;
           start_date?: string | null;
@@ -168,11 +191,19 @@ export type Database = {
           meal_type?: string | null;
           name?: string | null;
           order_id?: number;
+          orderitem_id?: number | null;
           price?: number | null;
           restaurant_id?: number | null;
           start_date?: string | null;
         };
         Relationships: [
+          {
+            foreignKeyName: 'orders_orderitem_id_fkey';
+            columns: ['orderitem_id'];
+            isOneToOne: false;
+            referencedRelation: 'orderitem';
+            referencedColumns: ['orderitem_id'];
+          },
           {
             foreignKeyName: 'public_orders_restaurant_id_fkey';
             columns: ['restaurant_id'];

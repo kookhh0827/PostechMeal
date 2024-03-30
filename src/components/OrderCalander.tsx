@@ -1,5 +1,6 @@
 'use client';
 
+import { QueryData } from '@supabase/supabase-js';
 import { format, isWithinInterval, parseISO } from 'date-fns';
 import { useEffect, useState } from 'react';
 
@@ -7,7 +8,6 @@ import { Tables } from '@/lib/database.types';
 import { createClient } from '@/lib/supabase/client';
 
 type Restaurant = Tables<'restaurants'>;
-type Order = Tables<'orders'>;
 
 interface OrderCalendarProps {
   restaurantId: number;
@@ -25,7 +25,6 @@ function mealtypetokorean(mealtype: string) {
 
 const OrderCalendar: React.FC<OrderCalendarProps> = ({ restaurantId }) => {
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
-  const [orders, setOrders] = useState<Order[]>([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
 
   useEffect(() => {
@@ -44,25 +43,29 @@ const OrderCalendar: React.FC<OrderCalendarProps> = ({ restaurantId }) => {
       setRestaurant(data);
     };
 
-    const fetchOrders = async () => {
-      const supabase = createClient();
-      const { data, error } = await supabase
-        .from('orders')
-        .select('*')
-        .eq('restaurant_id', restaurantId);
-
-      if (error) {
-        return;
-      }
-
-      setOrders(data || []);
-    };
-
     fetchRestaurant();
-    fetchOrders();
   }, [restaurantId]);
 
-  const renderOrdersByMealType = (mealType: string) => {
+  const fetchOrders = async () => {
+    const supabase = createClient();
+    const ordersQuery = supabase
+      .from('orders')
+      .select('*, orderitem(name, description)')
+      .eq('restaurant_id', restaurantId);
+
+    type OrdersWithOrderItem = QueryData<typeof ordersQuery>;
+
+    const { data, error } = await ordersQuery;
+    if (error) {
+      throw error;
+    }
+
+    const orders: OrdersWithOrderItem = data;
+    return orders;
+  };
+
+  const renderOrdersByMealType = async (mealType: string) => {
+    const orders = await fetchOrders();
     const filteredOrders = orders.filter(
       (order) =>
         order.meal_type === mealType &&
@@ -80,8 +83,8 @@ const OrderCalendar: React.FC<OrderCalendarProps> = ({ restaurantId }) => {
         <div className='grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4'>
           {filteredOrders.map((order) => (
             <div key={order.order_id} className='border p-4'>
-              <h5 className='text-md font-bold mb-2'>{order.name}</h5>
-              <p className='text-gray-600'>{order.description}</p>
+              <h5 className='text-md font-bold mb-2'>{order.orderitem.name}</h5>
+              <p className='text-gray-600'>{order.orderitem.description}</p>
               <p className='mt-2'>가격: {order.price}</p>
             </div>
           ))}
