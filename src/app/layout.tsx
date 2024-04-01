@@ -59,6 +59,11 @@ export default function RootLayout({
 }) {
   return (
     <html>
+      <script
+        defer
+        src='https://analytics.us.umami.is/script.js'
+        data-website-id='222be23d-da3d-4425-8435-f30ffbe7b162'
+      ></script>
       <Analytics />
       <SpeedInsights />
       <body>{children}</body>
