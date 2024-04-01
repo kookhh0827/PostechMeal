@@ -150,7 +150,7 @@ export default function HomePage() {
   return (
     <div className='container mx-auto py-8 px-1.5'>
       <div className='flex justify-between items-center mb-8'>
-        <h1 className='text-2xl font-bold'>카이스트 식당정보</h1>
+        <h1 className='text-2xl font-bold'>포스텍 식당정보</h1>
         <div>
           {nickname ? (
             <div className='flex items-center space-x-4'>
