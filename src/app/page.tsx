@@ -66,7 +66,8 @@ export default function HomePage() {
 
     const { data, error } = await supabase
       .from('restaurants')
-      .select('restaurant_id, name, type');
+      .select('restaurant_id, name, type')
+      .order('restaurant_id', { ascending: true });
 
     if (!error) {
       setRestaurants(data || []);
