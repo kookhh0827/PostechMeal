@@ -7,7 +7,7 @@ import { createClient } from '@/lib/supabase/server';
 const ReviewList = async ({ orderItemId }: { orderItemId: number }) => {
   const supabase = createClient();
   const { data: reviews } = await supabase
-    .from('reviews')
+    .from('reviews_with_nickname')
     .select('*')
     .eq('orderitem_id', orderItemId);
 
@@ -20,7 +20,7 @@ const ReviewList = async ({ orderItemId }: { orderItemId: number }) => {
         >
           <div className='flex justify-between items-center mb-2'>
             <p className='text-sm font-semibold text-gray-800'>
-              {review.users_id}
+              {review.nickname}
             </p>
             <p className='text-xs text-gray-500'>
               {format(new Date(review.created_at), 'yyyy-MM-dd HH:mm:ss')}

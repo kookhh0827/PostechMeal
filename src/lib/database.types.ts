@@ -39,6 +39,7 @@ export type Database = {
         Row: {
           comment_id: number;
           created_at: string;
+          is_deleted: boolean;
           message: string | null;
           restaurant_id: number | null;
           users_id: string | null;
@@ -46,6 +47,7 @@ export type Database = {
         Insert: {
           comment_id?: number;
           created_at?: string;
+          is_deleted?: boolean;
           message?: string | null;
           restaurant_id?: number | null;
           users_id?: string | null;
@@ -53,6 +55,7 @@ export type Database = {
         Update: {
           comment_id?: number;
           created_at?: string;
+          is_deleted?: boolean;
           message?: string | null;
           restaurant_id?: number | null;
           users_id?: string | null;
@@ -164,10 +167,8 @@ export type Database = {
       };
       orders: {
         Row: {
-          description: string | null;
           end_date: string | null;
           meal_type: string | null;
-          name: string | null;
           order_id: number;
           orderitem_id: number | null;
           price: number | null;
@@ -175,10 +176,8 @@ export type Database = {
           start_date: string | null;
         };
         Insert: {
-          description?: string | null;
           end_date?: string | null;
           meal_type?: string | null;
-          name?: string | null;
           order_id?: number;
           orderitem_id?: number | null;
           price?: number | null;
@@ -186,10 +185,8 @@ export type Database = {
           start_date?: string | null;
         };
         Update: {
-          description?: string | null;
           end_date?: string | null;
           meal_type?: string | null;
-          name?: string | null;
           order_id?: number;
           orderitem_id?: number | null;
           price?: number | null;
@@ -202,6 +199,20 @@ export type Database = {
             columns: ['orderitem_id'];
             isOneToOne: false;
             referencedRelation: 'orderitem';
+            referencedColumns: ['orderitem_id'];
+          },
+          {
+            foreignKeyName: 'orders_orderitem_id_fkey';
+            columns: ['orderitem_id'];
+            isOneToOne: false;
+            referencedRelation: 'orderitem_with_avg_rating';
+            referencedColumns: ['orderitem_id'];
+          },
+          {
+            foreignKeyName: 'orders_orderitem_id_fkey';
+            columns: ['orderitem_id'];
+            isOneToOne: false;
+            referencedRelation: 'orders_with_orderitem_and_avg_rating';
             referencedColumns: ['orderitem_id'];
           },
           {
@@ -260,6 +271,62 @@ export type Database = {
           type?: string | null;
         };
         Relationships: [];
+      };
+      reviews: {
+        Row: {
+          created_at: string;
+          message: string | null;
+          orderitem_id: number;
+          rating: number | null;
+          review_id: number;
+          users_id: string | null;
+        };
+        Insert: {
+          created_at?: string;
+          message?: string | null;
+          orderitem_id: number;
+          rating?: number | null;
+          review_id?: number;
+          users_id?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          message?: string | null;
+          orderitem_id?: number;
+          rating?: number | null;
+          review_id?: number;
+          users_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'public_reviews_orderitem_id_fkey';
+            columns: ['orderitem_id'];
+            isOneToOne: false;
+            referencedRelation: 'orderitem';
+            referencedColumns: ['orderitem_id'];
+          },
+          {
+            foreignKeyName: 'public_reviews_orderitem_id_fkey';
+            columns: ['orderitem_id'];
+            isOneToOne: false;
+            referencedRelation: 'orderitem_with_avg_rating';
+            referencedColumns: ['orderitem_id'];
+          },
+          {
+            foreignKeyName: 'public_reviews_orderitem_id_fkey';
+            columns: ['orderitem_id'];
+            isOneToOne: false;
+            referencedRelation: 'orders_with_orderitem_and_avg_rating';
+            referencedColumns: ['orderitem_id'];
+          },
+          {
+            foreignKeyName: 'public_reviews_users_id_fkey';
+            columns: ['users_id'];
+            isOneToOne: false;
+            referencedRelation: 'users';
+            referencedColumns: ['id'];
+          }
+        ];
       };
       users_like_comments: {
         Row: {
@@ -321,6 +388,81 @@ export type Database = {
           },
           {
             foreignKeyName: 'public_comments_users_id_fkey';
+            columns: ['users_id'];
+            isOneToOne: false;
+            referencedRelation: 'users';
+            referencedColumns: ['id'];
+          }
+        ];
+      };
+      orderitem_with_avg_rating: {
+        Row: {
+          avg_rating: number | null;
+          description: string | null;
+          name: string | null;
+          orderitem_id: number | null;
+          thumbnail_url: string | null;
+        };
+        Relationships: [];
+      };
+      orders_with_orderitem_and_avg_rating: {
+        Row: {
+          avg_rating: number | null;
+          end_date: string | null;
+          meal_type: string | null;
+          order_id: number | null;
+          orderitem_description: string | null;
+          orderitem_id: number | null;
+          orderitem_name: string | null;
+          orderitem_thumbnail_url: string | null;
+          price: number | null;
+          restaurant_id: number | null;
+          start_date: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'public_orders_restaurant_id_fkey';
+            columns: ['restaurant_id'];
+            isOneToOne: false;
+            referencedRelation: 'restaurants';
+            referencedColumns: ['restaurant_id'];
+          }
+        ];
+      };
+      reviews_with_nickname: {
+        Row: {
+          created_at: string | null;
+          message: string | null;
+          nickname: string | null;
+          orderitem_id: number | null;
+          rating: number | null;
+          review_id: number | null;
+          users_id: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'public_reviews_orderitem_id_fkey';
+            columns: ['orderitem_id'];
+            isOneToOne: false;
+            referencedRelation: 'orderitem';
+            referencedColumns: ['orderitem_id'];
+          },
+          {
+            foreignKeyName: 'public_reviews_orderitem_id_fkey';
+            columns: ['orderitem_id'];
+            isOneToOne: false;
+            referencedRelation: 'orderitem_with_avg_rating';
+            referencedColumns: ['orderitem_id'];
+          },
+          {
+            foreignKeyName: 'public_reviews_orderitem_id_fkey';
+            columns: ['orderitem_id'];
+            isOneToOne: false;
+            referencedRelation: 'orders_with_orderitem_and_avg_rating';
+            referencedColumns: ['orderitem_id'];
+          },
+          {
+            foreignKeyName: 'public_reviews_users_id_fkey';
             columns: ['users_id'];
             isOneToOne: false;
             referencedRelation: 'users';

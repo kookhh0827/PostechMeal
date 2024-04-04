@@ -2,20 +2,17 @@
 
 import { format, isWithinInterval, parseISO } from 'date-fns';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 import { Tables } from '@/lib/database.types';
 import { createClient } from '@/lib/supabase/client';
 
 import MealTypeTabs from '@/components/MealTypeTabs';
+import StarRating from '@/components/StarRating';
 
 type Restaurant = Tables<'restaurants'>;
-type Order = Tables<'orders'>;
-type OrderItem = Tables<'orderitem'>;
-
-interface OrderWithOrderItem extends Order {
-  orderitem: OrderItem;
-}
+type Order = Tables<'orders_with_orderitem_and_avg_rating'>;
 
 interface OrderCalendarProps {
   restaurantId: number;
@@ -24,7 +21,7 @@ interface OrderCalendarProps {
 const OrderCalendar: React.FC<OrderCalendarProps> = ({ restaurantId }) => {
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [orders, setOrders] = useState<OrderWithOrderItem[] | null>(null);
+  const [orders, setOrders] = useState<Order[] | null>(null);
   const [selectedMealType, setSelectedMealType] = useState<string | null>(null);
   const [mealTypes, setMealTypes] = useState<string[]>([]);
 
@@ -58,17 +55,16 @@ const OrderCalendar: React.FC<OrderCalendarProps> = ({ restaurantId }) => {
 
     const fetchOrders = async () => {
       const supabase = createClient();
-      const ordersQuery = supabase
-        .from('orders')
-        .select('*, orderitem(name, description, thumbnail_url)')
+      const { data, error } = await supabase
+        .from('orders_with_orderitem_and_avg_rating')
+        .select('*')
         .eq('restaurant_id', restaurantId);
 
-      const { data, error } = await ordersQuery;
       if (error) {
-        throw error;
+        return;
       }
 
-      setOrders(data as OrderWithOrderItem[]);
+      setOrders(data);
     };
 
     fetchRestaurant();
@@ -95,25 +91,33 @@ const OrderCalendar: React.FC<OrderCalendarProps> = ({ restaurantId }) => {
       <div className='mb-6'>
         <div className='grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4'>
           {filteredOrders.map((order) => (
-            <div key={order.order_id} className='border p-4'>
-              <div className='mb-2 w-full aspect-square relative'>
-                {order.orderitem.thumbnail_url ? (
-                  <Image
-                    src={order.orderitem.thumbnail_url}
-                    alt={order.orderitem.name || 'Error'}
-                    layout='fill'
-                    objectFit='cover'
-                  />
-                ) : (
-                  <div className='flex items-center justify-center w-full h-full bg-gray-200 text-gray-500'>
-                    No Image
-                  </div>
-                )}
+            <Link key={order.order_id} href={'/review/' + order.orderitem_id}>
+              <div className='border p-4'>
+                <div className='mb-2 w-full aspect-square relative'>
+                  {order.orderitem_thumbnail_url ? (
+                    <Image
+                      src={order.orderitem_thumbnail_url}
+                      alt={order.orderitem_name || 'Error'}
+                      layout='fill'
+                      objectFit='cover'
+                    />
+                  ) : (
+                    <div className='flex items-center justify-center w-full h-full bg-gray-200 text-gray-500'>
+                      No Image
+                    </div>
+                  )}
+                </div>
+                <h5 className='text-md font-bold mb-2'>
+                  {order.orderitem_name}
+                </h5>
+                <p className='text-gray-600'>{order.orderitem_description}</p>
+                <p className='mt-2'>가격: {order.price}</p>
+                <StarRating
+                  rating={order.avg_rating || 0}
+                  size='sm'
+                ></StarRating>
               </div>
-              <h5 className='text-md font-bold mb-2'>{order.orderitem.name}</h5>
-              <p className='text-gray-600'>{order.orderitem.description}</p>
-              <p className='mt-2'>가격: {order.price}</p>
-            </div>
+            </Link>
           ))}
         </div>
       </div>

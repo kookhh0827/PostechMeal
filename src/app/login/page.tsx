@@ -68,7 +68,7 @@ export default function LoginPage() {
           text: error,
         });
       } else {
-        router.push('/');
+        router.back();
       }
     }
   };
