@@ -23,13 +23,16 @@ const ReviewList = async ({ orderItemId }: { orderItemId: number }) => {
               {review.nickname}
             </p>
             <p className='text-xs text-gray-500'>
-              {format(new Date(review.created_at), 'yyyy-MM-dd HH:mm:ss')}
+              {review.created_at &&
+                format(new Date(review.created_at), 'yyyy-MM-dd HH:mm:ss')}
             </p>
           </div>
           <div className='flex items-center mb-2'>
-            <span className='text-yellow-500'>{'★'.repeat(review.rating)}</span>
+            <span className='text-yellow-500'>
+              {review.rating && '★'.repeat(review.rating)}
+            </span>
             <span className='text-gray-500'>
-              {'★'.repeat(5 - review.rating)}
+              {review.rating && '★'.repeat(5 - review.rating)}
             </span>
           </div>
           <p className='text-gray-700'>{review.message}</p>
