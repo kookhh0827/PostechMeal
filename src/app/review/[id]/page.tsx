@@ -33,7 +33,7 @@ const OrderItemReviewPage = async ({ params }: { params: { id: number } }) => {
         </div>
         <div className='flex justify-center mb-8'>
           <div className='w-64 h-64 relative'>
-            {orderitem.thumbnail_url ? (
+            {orderitem && orderitem.thumbnail_url ? (
               <Image
                 src={orderitem.thumbnail_url}
                 alt='Thumbnail'
