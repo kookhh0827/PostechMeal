@@ -17,12 +17,10 @@ export async function generateStaticParams() {
     .select('*')
     .order('restaurant_id');
 
-  return (
-    restaurants &&
-    restaurants.map((restaurant) => ({
-      id: restaurant.restaurant_id.toString(),
-    }))
-  );
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  return restaurants!.map((restaurant) => ({
+    id: restaurant.restaurant_id.toString(),
+  }));
 }
 
 type Restaurant = Tables<'restaurants'>;
