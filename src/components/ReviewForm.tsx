@@ -37,6 +37,30 @@ const ReviewForm = ({ orderItemId }: { orderItemId: number }) => {
       return;
     }
 
+    const { data: dup_review } = await supabase
+      .from('reviews')
+      .select('*')
+      .eq('orderitem_id', orderItemId)
+      .eq('users_id', authData.user.id)
+      .order('created_at', { ascending: false })
+      .limit(1);
+
+    if (dup_review && dup_review.length > 0) {
+      const lastReviewTimestamp = new Date(dup_review[0].created_at).getTime();
+      const currentTimestamp = new Date().getTime();
+      const timeDifferenceInHours =
+        (currentTimestamp - lastReviewTimestamp) / 1000 / 60 / 60;
+
+      if (timeDifferenceInHours < 24) {
+        Swal.fire({
+          icon: 'warning',
+          title: '리뷰 작성 제한',
+          text: '한 메뉴에 대한 리뷰는 24시간에 하나만 작성하실 수 있습니다.',
+        });
+        return;
+      }
+    }
+
     const { error } = await supabase
       .from('reviews')
       .insert({ rating, message, orderitem_id: orderItemId });
