@@ -4,10 +4,15 @@ import { Star } from 'lucide-react';
 
 interface StarRatingProps {
   rating: number;
+  num_rating: number;
   size: 'lg' | 'sm';
 }
 
-const StarRating: React.FC<StarRatingProps> = ({ rating, size }) => {
+const StarRating: React.FC<StarRatingProps> = ({
+  rating,
+  num_rating,
+  size,
+}) => {
   const fullStars = Math.floor(rating);
   const emptyStars = 5 - fullStars;
 
@@ -20,7 +25,9 @@ const StarRating: React.FC<StarRatingProps> = ({ rating, size }) => {
         {[...Array(emptyStars)].map((_, index) => (
           <Star key={`empty-${index}`} className='w-6 h-6 text-gray-300' />
         ))}
-        <span className='ml-2 text-xl font-semibold'>{rating.toFixed(1)}</span>
+        <span className='ml-2 text-xl font-semibold'>
+          {rating.toFixed(1)} ({num_rating})
+        </span>
       </div>
     );
   } else if (size === 'sm') {
@@ -32,7 +39,9 @@ const StarRating: React.FC<StarRatingProps> = ({ rating, size }) => {
         {[...Array(emptyStars)].map((_, index) => (
           <Star key={`empty-${index}`} className='w-4 h-4 text-gray-300' />
         ))}
-        <span className='ml-2 text-sm font-semibold'>{rating.toFixed(1)}</span>
+        <span className='ml-2 text-sm font-semibold'>
+          {rating.toFixed(1)} ({num_rating})
+        </span>
       </div>
     );
   }

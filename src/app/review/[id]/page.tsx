@@ -28,6 +28,7 @@ const OrderItemReviewPage = async ({ params }: { params: { id: number } }) => {
         <div className='flex justify-center mb-4'>
           <StarRating
             rating={orderitem?.avg_rating || 0}
+            num_rating={orderitem?.num_rating || 0}
             size='lg'
           ></StarRating>
         </div>

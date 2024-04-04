@@ -58,7 +58,8 @@ const OrderCalendar: React.FC<OrderCalendarProps> = ({ restaurantId }) => {
       const { data, error } = await supabase
         .from('orders_with_orderitem_and_avg_rating')
         .select('*')
-        .eq('restaurant_id', restaurantId);
+        .eq('restaurant_id', restaurantId)
+        .order('num_rating', { ascending: false });
 
       if (error) {
         return;
@@ -114,6 +115,7 @@ const OrderCalendar: React.FC<OrderCalendarProps> = ({ restaurantId }) => {
                 <p className='mt-2'>가격: {order.price}</p>
                 <StarRating
                   rating={order.avg_rating || 0}
+                  num_rating={order.num_rating || 0}
                   size='sm'
                 ></StarRating>
               </div>

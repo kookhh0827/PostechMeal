@@ -400,6 +400,7 @@ export type Database = {
           avg_rating: number | null;
           description: string | null;
           name: string | null;
+          num_rating: number | null;
           orderitem_id: number | null;
           thumbnail_url: string | null;
         };
@@ -410,6 +411,7 @@ export type Database = {
           avg_rating: number | null;
           end_date: string | null;
           meal_type: string | null;
+          num_rating: number | null;
           order_id: number | null;
           orderitem_description: string | null;
           orderitem_id: number | null;
