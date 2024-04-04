@@ -41,7 +41,9 @@ const Header: React.FC = () => {
 
   return (
     <div className='flex justify-between items-center mb-8'>
-      <h1 className='text-2xl font-bold'>포스텍 식당정보</h1>
+      <Link href='/'>
+        <h1 className='text-2xl font-bold'>포스텍 식당정보</h1>
+      </Link>
       <div>
         {nickname ? (
           <div className='flex items-center space-x-4'>
