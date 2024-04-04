@@ -38,6 +38,9 @@ const ReviewList = async ({ orderItemId }: { orderItemId: number }) => {
           <p className='text-gray-700'>{review.message}</p>
         </div>
       ))}
+      {reviews?.length == 0 && (
+        <div>아직 리뷰가 없어요! 첫 번째 리뷰를 작성 해보세요.</div>
+      )}
     </div>
   );
 };
