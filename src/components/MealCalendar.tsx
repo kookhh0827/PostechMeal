@@ -220,8 +220,12 @@ const MealCalendar: React.FC<MealCalendarProps> = ({ restaurantId }) => {
                 addDays(startOfWeekDate, index),
                 'yyyy-MM-dd'
               );
+              const isToday = date === format(new Date(), 'yyyy-MM-dd');
               return (
-                <div key={date} className='border p-4'>
+                <div
+                  key={date}
+                  className={`border p-4 ${isToday ? 'bg-yellow-100' : ''}`}
+                >
                   {renderMealsByDate(date)}
                 </div>
               );

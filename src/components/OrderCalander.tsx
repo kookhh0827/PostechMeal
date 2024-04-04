@@ -1,10 +1,13 @@
 'use client';
 
 import { format, isWithinInterval, parseISO } from 'date-fns';
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
 import { Tables } from '@/lib/database.types';
 import { createClient } from '@/lib/supabase/client';
+
+import MealTypeTabs from '@/components/MealTypeTabs';
 
 type Restaurant = Tables<'restaurants'>;
 type Order = Tables<'orders'>;
@@ -18,20 +21,12 @@ interface OrderCalendarProps {
   restaurantId: number;
 }
 
-function mealtypetokorean(mealtype: string) {
-  if (mealtype === 'breakfast') {
-    return '아침';
-  } else if (mealtype === 'lunch') {
-    return '점심';
-  } else if (mealtype === 'dinner') {
-    return '저녁';
-  }
-}
-
 const OrderCalendar: React.FC<OrderCalendarProps> = ({ restaurantId }) => {
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [orders, setOrders] = useState<OrderWithOrderItem[] | null>(null);
+  const [selectedMealType, setSelectedMealType] = useState<string | null>(null);
+  const [mealTypes, setMealTypes] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchRestaurant = async () => {
@@ -47,13 +42,25 @@ const OrderCalendar: React.FC<OrderCalendarProps> = ({ restaurantId }) => {
       }
 
       setRestaurant(data);
+
+      const availableMealTypes = ['breakfast', 'lunch', 'dinner'].filter(
+        (mealType) => {
+          if (mealType === 'breakfast' && data?.serving_breakfast) return true;
+          if (mealType === 'lunch' && data?.serving_lunch) return true;
+          if (mealType === 'dinner' && data?.serving_dinner) return true;
+          return false;
+        }
+      );
+
+      setMealTypes(availableMealTypes);
+      setSelectedMealType(availableMealTypes[0]);
     };
 
     const fetchOrders = async () => {
       const supabase = createClient();
       const ordersQuery = supabase
         .from('orders')
-        .select('*, orderitem(name, description)')
+        .select('*, orderitem(name, description, thumbnail_url)')
         .eq('restaurant_id', restaurantId);
 
       const { data, error } = await ordersQuery;
@@ -86,10 +93,23 @@ const OrderCalendar: React.FC<OrderCalendarProps> = ({ restaurantId }) => {
 
     return (
       <div className='mb-6'>
-        <h4 className='text-lg font-bold mb-2'>{mealtypetokorean(mealType)}</h4>
         <div className='grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4'>
           {filteredOrders.map((order) => (
             <div key={order.order_id} className='border p-4'>
+              <div className='mb-2 w-full aspect-square relative'>
+                {order.orderitem.thumbnail_url ? (
+                  <Image
+                    src={order.orderitem.thumbnail_url}
+                    alt={order.orderitem.name || 'Error'}
+                    layout='fill'
+                    objectFit='cover'
+                  />
+                ) : (
+                  <div className='flex items-center justify-center w-full h-full bg-gray-200 text-gray-500'>
+                    No Image
+                  </div>
+                )}
+              </div>
               <h5 className='text-md font-bold mb-2'>{order.orderitem.name}</h5>
               <p className='text-gray-600'>{order.orderitem.description}</p>
               <p className='mt-2'>가격: {order.price}</p>
@@ -141,9 +161,12 @@ const OrderCalendar: React.FC<OrderCalendarProps> = ({ restaurantId }) => {
           className='border border-gray-300 rounded px-2 py-1'
         />
       </div>
-      {restaurant.serving_breakfast && renderOrdersByMealType('breakfast')}
-      {restaurant.serving_lunch && renderOrdersByMealType('lunch')}
-      {restaurant.serving_dinner && renderOrdersByMealType('dinner')}
+      <MealTypeTabs
+        mealTypes={mealTypes}
+        selectedMealType={selectedMealType || ''}
+        onSelectMealType={setSelectedMealType}
+      />
+      {selectedMealType && renderOrdersByMealType(selectedMealType)}
     </div>
   );
 };
