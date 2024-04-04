@@ -50,6 +50,16 @@ const nextConfig = {
 
     return config;
   },
+
+  async redirects() {
+    return [
+      {
+        source: '/',
+        destination: '/restaurant/1',
+        permanent: true,
+      },
+    ];
+  },
 };
 
 module.exports = nextConfig;
