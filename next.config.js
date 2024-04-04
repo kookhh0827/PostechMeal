@@ -16,7 +16,10 @@ const nextConfig = {
   swcMinify: true,
 
   images: {
-    domains: ['nef5ihxclffmagbg.public.blob.vercel-storage.com'],
+    domains: [
+      'nef5ihxclffmagbg.public.blob.vercel-storage.com',
+      'mmxbkxvsupgscgbjyvqj.supabase.co',
+    ],
   },
 
   webpack(config) {
