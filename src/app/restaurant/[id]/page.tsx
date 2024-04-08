@@ -1,5 +1,9 @@
 // @/app/restaurant/[id].tsx
 
+import { endOfWeek, format, startOfWeek } from 'date-fns';
+import { headers } from 'next/headers';
+import { getSelectorsByUserAgent } from 'react-device-detect';
+
 import { Tables } from '@/lib/database.types';
 import { createPrivateClient } from '@/lib/supabase/private';
 import { createClient } from '@/lib/supabase/server';
@@ -23,6 +27,50 @@ export async function generateStaticParams() {
   }));
 }
 
+const fetchMealsForWeek = async (week: Date, restaurant_id: number) => {
+  const supabase = createClient();
+  const startDate = format(
+    startOfWeek(week, { weekStartsOn: 1 }),
+    'yyyy-MM-dd'
+  );
+  const endDate = format(endOfWeek(week, { weekStartsOn: 1 }), 'yyyy-MM-dd');
+
+  const { data, error } = await supabase
+    .from('meals')
+    .select(
+      `
+      *,
+      menuitems (
+        *
+      )
+    `
+    )
+    .eq('restaurant_id', restaurant_id)
+    .gte('date', startDate)
+    .lte('date', endDate)
+    .order('meal_type');
+
+  if (error) {
+    return null;
+  }
+  return data;
+};
+
+const fetchOrders = async (restaurant_id: number) => {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from('orders_with_orderitem_and_avg_rating')
+    .select('*')
+    .eq('restaurant_id', restaurant_id)
+    .order('avg_rating', { ascending: false })
+    .order('num_rating', { ascending: false });
+
+  if (error) {
+    return null;
+  }
+  return data;
+};
+
 type Restaurant = Tables<'restaurants'>;
 
 const OrderItemReviewPage = async ({ params }: { params: { id: string } }) => {
@@ -32,6 +80,14 @@ const OrderItemReviewPage = async ({ params }: { params: { id: string } }) => {
     .from('restaurants')
     .select('*')
     .order('restaurant_id');
+  const { data: restaurantInfo } = await supabase
+    .from('restaurants')
+    .select('*')
+    .eq('restaurant_id', id)
+    .single();
+  const { isMobile } = getSelectorsByUserAgent(
+    headers().get('user-agent') ?? ''
+  );
 
   return (
     <div className='container mx-auto py-8 px-1.5'>
@@ -40,12 +96,19 @@ const OrderItemReviewPage = async ({ params }: { params: { id: string } }) => {
         restaurants={restaurants as Restaurant[]}
         selectedRestaurant={id}
       ></RestaurantTabs>
-      {restaurants &&
-      restaurants.find((restaurant) => restaurant.restaurant_id == id)?.type ===
-        'meal' ? (
-        <MealCalendar restaurantId={id} />
+      {restaurantInfo && restaurantInfo.type === 'meal' ? (
+        <MealCalendar
+          restaurantInfo={restaurantInfo}
+          initialMeals={await fetchMealsForWeek(new Date(), id)}
+          initialisMobile={isMobile}
+        />
       ) : (
-        <OrderCalendar restaurantId={id} />
+        restaurantInfo && (
+          <OrderCalendar
+            restaurantInfo={restaurantInfo}
+            initialOrders={await fetchOrders(id)}
+          />
+        )
       )}
       <CommentBox restaurant_id={id}></CommentBox>
     </div>

@@ -3,10 +3,9 @@
 import { format, isWithinInterval, parseISO } from 'date-fns';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { Tables } from '@/lib/database.types';
-import { createClient } from '@/lib/supabase/client';
 
 import MealTypeTabs from '@/components/MealTypeTabs';
 import StarRating from '@/components/StarRating';
@@ -15,70 +14,36 @@ type Restaurant = Tables<'restaurants'>;
 type Order = Tables<'orders_with_orderitem_and_avg_rating'>;
 
 interface OrderCalendarProps {
-  restaurantId: number;
+  restaurantInfo: Restaurant;
+  initialOrders: Order[] | null;
 }
 
-const OrderCalendar: React.FC<OrderCalendarProps> = ({ restaurantId }) => {
-  const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
+const OrderCalendar: React.FC<OrderCalendarProps> = ({
+  restaurantInfo,
+  initialOrders,
+}) => {
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [orders, setOrders] = useState<Order[] | null>(null);
-  const [selectedMealType, setSelectedMealType] = useState<string | null>(null);
-  const [mealTypes, setMealTypes] = useState<string[]>([]);
 
-  useEffect(() => {
-    const fetchRestaurant = async () => {
-      const supabase = createClient();
-      const { data, error } = await supabase
-        .from('restaurants')
-        .select('*')
-        .eq('restaurant_id', restaurantId)
-        .single();
-
-      if (error) {
-        return;
-      }
-
-      setRestaurant(data);
-
-      const availableMealTypes = ['breakfast', 'lunch', 'dinner'].filter(
-        (mealType) => {
-          if (mealType === 'breakfast' && data?.serving_breakfast) return true;
-          if (mealType === 'lunch' && data?.serving_lunch) return true;
-          if (mealType === 'dinner' && data?.serving_dinner) return true;
-          return false;
-        }
-      );
-
-      setMealTypes(availableMealTypes);
-      setSelectedMealType(availableMealTypes[0]);
-    };
-
-    const fetchOrders = async () => {
-      const supabase = createClient();
-      const { data, error } = await supabase
-        .from('orders_with_orderitem_and_avg_rating')
-        .select('*')
-        .eq('restaurant_id', restaurantId)
-        .order('avg_rating', { ascending: false })
-        .order('num_rating', { ascending: false });
-
-      if (error) {
-        return;
-      }
-
-      setOrders(data);
-    };
-
-    fetchRestaurant();
-    fetchOrders();
-  }, [restaurantId]);
+  const availableMealTypes = ['breakfast', 'lunch', 'dinner'].filter(
+    (mealType) => {
+      if (mealType === 'breakfast' && restaurantInfo?.serving_breakfast)
+        return true;
+      if (mealType === 'lunch' && restaurantInfo?.serving_lunch) return true;
+      if (mealType === 'dinner' && restaurantInfo?.serving_dinner) return true;
+      return false;
+    }
+  );
+  const [mealTypes] = useState<string[]>(availableMealTypes);
+  const [selectedMealType, setSelectedMealType] = useState<string>(
+    availableMealTypes[0]
+  );
 
   const renderOrdersByMealType = (mealType: string) => {
-    if (!orders) {
+    if (!initialOrders) {
       return null;
     }
 
-    const filteredOrders = orders.filter(
+    const filteredOrders = initialOrders.filter(
       (order) =>
         order.meal_type === mealType &&
         order.start_date &&
@@ -127,32 +92,28 @@ const OrderCalendar: React.FC<OrderCalendarProps> = ({ restaurantId }) => {
     );
   };
 
-  if (!restaurant) {
-    return <div>로딩중...</div>;
-  }
-
   return (
     <div className='mx-auto'>
-      {restaurant.location && (
-        <p className='text-lg mb-4'>위치: {restaurant.location}</p>
+      {restaurantInfo.location && (
+        <p className='text-lg mb-4'>위치: {restaurantInfo.location}</p>
       )}
       <div className='mb-4'>
-        {restaurant.serving_breakfast && (
+        {restaurantInfo.serving_breakfast && (
           <p>
-            아침 식사 시간: {restaurant.breakfast_start_time} -{' '}
-            {restaurant.breakfast_end_time}
+            아침 식사 시간: {restaurantInfo.breakfast_start_time} -{' '}
+            {restaurantInfo.breakfast_end_time}
           </p>
         )}
-        {restaurant.serving_lunch && (
+        {restaurantInfo.serving_lunch && (
           <p>
-            점심 식사 시간: {restaurant.lunch_start_time} -{' '}
-            {restaurant.lunch_end_time}
+            점심 식사 시간: {restaurantInfo.lunch_start_time} -{' '}
+            {restaurantInfo.lunch_end_time}
           </p>
         )}
-        {restaurant.serving_dinner && (
+        {restaurantInfo.serving_dinner && (
           <p>
-            저녁 식사 시간: {restaurant.dinner_start_time} -{' '}
-            {restaurant.dinner_end_time}
+            저녁 식사 시간: {restaurantInfo.dinner_start_time} -{' '}
+            {restaurantInfo.dinner_end_time}
           </p>
         )}
       </div>

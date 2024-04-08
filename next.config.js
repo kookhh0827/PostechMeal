@@ -16,9 +16,11 @@ const nextConfig = {
   swcMinify: true,
 
   images: {
-    domains: [
-      'nef5ihxclffmagbg.public.blob.vercel-storage.com',
-      'mmxbkxvsupgscgbjyvqj.supabase.co',
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'mmxbkxvsupgscgbjyvqj.supabase.co',
+      },
     ],
   },
 

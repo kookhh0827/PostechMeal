@@ -1,43 +1,18 @@
-'use client';
 // @/components/Header.tsx
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
 
-import { createClient } from '@/lib/supabase/client';
+import { createClient } from '@/lib/supabase/server';
 
-const Header: React.FC = () => {
-  const [nickname, setNickname] = useState<string | null>(null);
+import LogoutButton from '@/components/LogoutButton';
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      const supabase = createClient();
-      const { data: authData, error: authError } =
-        await supabase.auth.getUser();
+const Header: React.FC = async () => {
+  const supabase = createClient();
 
-      if (!authError && authData.user) {
-        const { data: userData, error: userError } = await supabase
-          .from('accounts')
-          .select('nickname')
-          .maybeSingle();
-
-        if (!userError && userData) {
-          setNickname(userData.nickname);
-        }
-      }
-    };
-
-    fetchUser();
-  }, []);
-
-  const handleSignout = async () => {
-    const supabase = createClient();
-    const { error } = await supabase.auth.signOut();
-
-    if (!error) {
-      setNickname(null);
-    }
-  };
+  const { data: userData } = await supabase
+    .from('accounts')
+    .select('nickname')
+    .maybeSingle();
 
   return (
     <div className='flex justify-between items-center mb-8'>
@@ -45,15 +20,10 @@ const Header: React.FC = () => {
         <h1 className='text-2xl font-bold'>포스텍 식당정보</h1>
       </Link>
       <div>
-        {nickname ? (
+        {userData?.nickname ? (
           <div className='flex items-center space-x-4'>
-            <span className='text-gray-700'>{nickname}</span>
-            <button
-              className='px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600'
-              onClick={handleSignout}
-            >
-              로그아웃
-            </button>
+            <span className='text-gray-700'>{userData.nickname}</span>
+            <LogoutButton></LogoutButton>
           </div>
         ) : (
           <div className='space-x-4'>

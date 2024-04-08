@@ -8,11 +8,15 @@ import { Tables } from '@/lib/database.types';
 import { createClient } from '@/lib/supabase/client';
 
 type Restaurant = Tables<'restaurants'>;
-type Meal = Tables<'meals'>;
 type MenuItem = Tables<'menuitems'>;
+type Meal = Tables<'meals'> & {
+  menuitems: MenuItem[];
+};
 
 interface MealCalendarProps {
-  restaurantId: number;
+  restaurantInfo: Restaurant;
+  initialMeals: Meal[] | null;
+  initialisMobile: boolean;
 }
 
 function mealtypetokorean(mealtype: string) {
@@ -25,29 +29,16 @@ function mealtypetokorean(mealtype: string) {
   }
 }
 
-const MealCalendar: React.FC<MealCalendarProps> = ({ restaurantId }) => {
+const MealCalendar: React.FC<MealCalendarProps> = ({
+  restaurantInfo,
+  initialMeals,
+  initialisMobile,
+}) => {
   const [selectedWeek, setSelectedWeek] = useState(new Date());
-  const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
-  const [meals, setMeals] = useState<Meal[]>([]);
-  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
-  const [isMobile, setIsMobile] = useState(false);
+  const [meals, setMeals] = useState<Meal[] | null>(initialMeals);
+  const [isMobile, setIsMobile] = useState(initialisMobile);
 
   useEffect(() => {
-    const fetchRestaurant = async () => {
-      const supabase = createClient();
-      const { data, error } = await supabase
-        .from('restaurants')
-        .select('*')
-        .eq('restaurant_id', restaurantId)
-        .single();
-
-      if (error) {
-        return;
-      }
-
-      setRestaurant(data);
-    };
-
     const fetchMealsForWeek = async (week: Date) => {
       const supabase = createClient();
       const startDate = format(
@@ -69,7 +60,7 @@ const MealCalendar: React.FC<MealCalendarProps> = ({ restaurantId }) => {
           )
         `
         )
-        .eq('restaurant_id', restaurantId)
+        .eq('restaurant_id', restaurantInfo.restaurant_id)
         .gte('date', startDate)
         .lte('date', endDate)
         .order('meal_type');
@@ -78,13 +69,10 @@ const MealCalendar: React.FC<MealCalendarProps> = ({ restaurantId }) => {
         return;
       }
 
-      setMeals(mealData || []);
-      setMenuItems(mealData?.flatMap((meal) => meal.menuitems) || []);
+      setMeals(mealData);
     };
-
-    fetchRestaurant();
     fetchMealsForWeek(selectedWeek);
-  }, [restaurantId, selectedWeek]);
+  }, [restaurantInfo, selectedWeek]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -100,6 +88,9 @@ const MealCalendar: React.FC<MealCalendarProps> = ({ restaurantId }) => {
   }, []);
 
   const renderMealsByDate = (date: string) => {
+    if (!meals) {
+      return;
+    }
     const mealsForDate = meals.filter((meal) => meal.date === date);
 
     const groupedMeals = mealsForDate.reduce((acc, meal) => {
@@ -126,13 +117,11 @@ const MealCalendar: React.FC<MealCalendarProps> = ({ restaurantId }) => {
               <div key={meal.meal_id} className='border p-4 mb-2'>
                 <h5 className='text-md font-bold mb-2'>{meal.name}</h5>
                 <ul className='space-y-1'>
-                  {menuItems
-                    .filter((item) => item.meal_id === meal.meal_id)
-                    .map((item) => (
-                      <li key={item.menu_item_id} className='text-gray-700'>
-                        {item.name}
-                      </li>
-                    ))}
+                  {meal.menuitems.map((item) => (
+                    <li key={item.menu_item_id} className='text-gray-700'>
+                      {item.name}
+                    </li>
+                  ))}
                 </ul>
                 <p className='mt-2'>가격: {meal.price}</p>
               </div>
@@ -142,10 +131,6 @@ const MealCalendar: React.FC<MealCalendarProps> = ({ restaurantId }) => {
       </div>
     );
   };
-
-  if (!restaurant) {
-    return <div>로딩중...</div>;
-  }
 
   const startOfWeekDate = startOfWeek(selectedWeek, { weekStartsOn: 1 });
   const endOfWeekDate = endOfWeek(selectedWeek, { weekStartsOn: 1 });
@@ -160,27 +145,27 @@ const MealCalendar: React.FC<MealCalendarProps> = ({ restaurantId }) => {
 
   return (
     <div className='mx-auto'>
-      {/* {<h2 className='text-2xl font-bold mb-4'>{restaurant.name} 식단</h2>} */}
-      {restaurant.location && (
-        <p className='text-lg mb-4'>위치: {restaurant.location}</p>
+      {/* {<h2 className='text-2xl font-bold mb-4'>{restaurantInfo.name} 식단</h2>} */}
+      {restaurantInfo.location && (
+        <p className='text-lg mb-4'>위치: {restaurantInfo.location}</p>
       )}
       <div className='mb-4'>
-        {restaurant.serving_breakfast && (
+        {restaurantInfo.serving_breakfast && (
           <p>
-            아침 식사 시간: {restaurant.breakfast_start_time} -{' '}
-            {restaurant.breakfast_end_time}
+            아침 식사 시간: {restaurantInfo.breakfast_start_time} -{' '}
+            {restaurantInfo.breakfast_end_time}
           </p>
         )}
-        {restaurant.serving_lunch && (
+        {restaurantInfo.serving_lunch && (
           <p>
-            점심 식사 시간: {restaurant.lunch_start_time} -{' '}
-            {restaurant.lunch_end_time}
+            점심 식사 시간: {restaurantInfo.lunch_start_time} -{' '}
+            {restaurantInfo.lunch_end_time}
           </p>
         )}
-        {restaurant.serving_dinner && (
+        {restaurantInfo.serving_dinner && (
           <p>
-            저녁 식사 시간: {restaurant.dinner_start_time} -{' '}
-            {restaurant.dinner_end_time}
+            저녁 식사 시간: {restaurantInfo.dinner_start_time} -{' '}
+            {restaurantInfo.dinner_end_time}
           </p>
         )}
       </div>
