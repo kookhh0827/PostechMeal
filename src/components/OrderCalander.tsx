@@ -59,6 +59,7 @@ const OrderCalendar: React.FC<OrderCalendarProps> = ({ restaurantId }) => {
         .from('orders_with_orderitem_and_avg_rating')
         .select('*')
         .eq('restaurant_id', restaurantId)
+        .order('avg_rating', { ascending: false })
         .order('num_rating', { ascending: false });
 
       if (error) {
