@@ -1,8 +1,8 @@
 // src/components/RestaurantTabs.tsx
 
-import Link from 'next/link';
-
 import { Tables } from '@/lib/database.types';
+
+import LinkWrapper from '@/components/LinkWrapper';
 
 type Restaurant = Tables<'restaurants'>;
 
@@ -27,9 +27,9 @@ const RestaurantTabs: React.FC<RestaurantTabsProps> = ({
                 : 'font-light'
             } ${index === restaurants.length - 1 ? 'pr-4' : ''}`}
           >
-            <Link href={`/restaurant/${restaurant.restaurant_id}`}>
+            <LinkWrapper href={`/restaurant/${restaurant.restaurant_id}`}>
               {restaurant.name}
-            </Link>
+            </LinkWrapper>
           </li>
         ))}
       </ul>

@@ -4,6 +4,7 @@ import Link from 'next/link';
 
 import { createClient } from '@/lib/supabase/server';
 
+import LinkWrapper from '@/components/LinkWrapper';
 import LogoutButton from '@/components/LogoutButton';
 
 const Header: React.FC = async () => {
@@ -27,16 +28,16 @@ const Header: React.FC = async () => {
           </div>
         ) : (
           <div className='space-x-4'>
-            <Link href='/login'>
+            <LinkWrapper href='/login'>
               <button className='px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600'>
                 로그인
               </button>
-            </Link>
-            <Link href='/signup'>
+            </LinkWrapper>
+            <LinkWrapper href='/signup'>
               <button className='px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600'>
                 회원가입
               </button>
-            </Link>
+            </LinkWrapper>
           </div>
         )}
       </div>
