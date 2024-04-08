@@ -2,6 +2,7 @@
 
 import { endOfWeek, format, startOfWeek } from 'date-fns';
 import { headers } from 'next/headers';
+import { cache } from 'react';
 import { getSelectorsByUserAgent } from 'react-device-detect';
 
 import { Tables } from '@/lib/database.types';
@@ -27,7 +28,7 @@ export async function generateStaticParams() {
   }));
 }
 
-const fetchMealsForWeek = async (week: Date, restaurant_id: number) => {
+const fetchMealsForWeek = cache(async (week: Date, restaurant_id: number) => {
   const supabase = createClient();
   const startDate = format(
     startOfWeek(week, { weekStartsOn: 1 }),
@@ -54,9 +55,9 @@ const fetchMealsForWeek = async (week: Date, restaurant_id: number) => {
     return null;
   }
   return data;
-};
+});
 
-const fetchOrders = async (restaurant_id: number) => {
+const fetchOrders = cache(async (restaurant_id: number) => {
   const supabase = createClient();
   const { data, error } = await supabase
     .from('orders_with_orderitem_and_avg_rating')
@@ -69,22 +70,25 @@ const fetchOrders = async (restaurant_id: number) => {
     return null;
   }
   return data;
-};
+});
 
-type Restaurant = Tables<'restaurants'>;
-
-const OrderItemReviewPage = async ({ params }: { params: { id: string } }) => {
-  const id = parseInt(params.id);
+export const fetchRestaurants = cache(async () => {
   const supabase = createClient();
   const { data: restaurants } = await supabase
     .from('restaurants')
     .select('*')
     .order('restaurant_id');
-  const { data: restaurantInfo } = await supabase
-    .from('restaurants')
-    .select('*')
-    .eq('restaurant_id', id)
-    .single();
+  return restaurants;
+});
+
+type Restaurant = Tables<'restaurants'>;
+
+const OrderItemReviewPage = async ({ params }: { params: { id: string } }) => {
+  const id = parseInt(params.id);
+  const restaurants = await fetchRestaurants();
+  const restaurantInfo = restaurants?.filter(
+    (restaurant) => restaurant.restaurant_id === id
+  )[0];
   const { isMobile } = getSelectorsByUserAgent(
     headers().get('user-agent') ?? ''
   );
