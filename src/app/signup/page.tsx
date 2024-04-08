@@ -174,6 +174,9 @@ export default function SignupPage() {
             {emailError && (
               <p className='text-red-500 text-sm mt-1'>{emailError}</p>
             )}
+            <p className='text-gray-500 text-sm mt-1'>
+              해당 주소로 인증 메일이 발송됩니다.
+            </p>
           </div>
           <div className='mb-4'>
             <label
