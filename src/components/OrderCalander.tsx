@@ -2,11 +2,11 @@
 
 import { format, isWithinInterval, parseISO } from 'date-fns';
 import Image from 'next/image';
-import Link from 'next/link';
 import { useState } from 'react';
 
 import { Tables } from '@/lib/database.types';
 
+import LinkWrapper from '@/components/LinkWrapper';
 import MealTypeTabs from '@/components/MealTypeTabs';
 import StarRating from '@/components/StarRating';
 
@@ -58,7 +58,10 @@ const OrderCalendar: React.FC<OrderCalendarProps> = ({
       <div className='mb-6'>
         <div className='grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4'>
           {filteredOrders.map((order) => (
-            <Link key={order.order_id} href={'/review/' + order.orderitem_id}>
+            <LinkWrapper
+              key={order.order_id}
+              href={'/review/' + order.orderitem_id}
+            >
               <div className='border p-4'>
                 <div className='mb-2 w-full aspect-square relative'>
                   {order.orderitem_thumbnail_url ? (
@@ -85,7 +88,7 @@ const OrderCalendar: React.FC<OrderCalendarProps> = ({
                   size='sm'
                 ></StarRating>
               </div>
-            </Link>
+            </LinkWrapper>
           ))}
         </div>
       </div>
