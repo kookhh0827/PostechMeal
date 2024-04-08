@@ -1,3 +1,4 @@
+import { GoogleAnalytics } from '@next/third-parties/google';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Metadata } from 'next';
@@ -66,6 +67,7 @@ export default function RootLayout({
       ></script>
       <Analytics />
       <SpeedInsights />
+      <GoogleAnalytics gaId='GTM-TJG49FZS'></GoogleAnalytics>
       <body>{children}</body>
       <footer className='mt-auto bg-gray-800 text-white py-4 text-sm px-1.5'>
         <div className='container mx-auto flex justify-between items-center'>
