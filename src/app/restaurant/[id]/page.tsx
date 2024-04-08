@@ -72,7 +72,7 @@ const fetchOrders = cache(async (restaurant_id: number) => {
   return data;
 });
 
-export const fetchRestaurants = cache(async () => {
+const fetchRestaurants = cache(async () => {
   const supabase = createClient();
   const { data: restaurants } = await supabase
     .from('restaurants')
