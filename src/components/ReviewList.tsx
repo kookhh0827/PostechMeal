@@ -29,10 +29,13 @@ const ReviewList = async ({ orderItemId }: { orderItemId: number }) => {
           </div>
           <div className='flex items-center mb-2'>
             <span className='text-yellow-500'>
-              {review.rating && '★'.repeat(review.rating)}
+              {review.rating && review.rating > 0
+                ? '★'.repeat(review.rating)
+                : null}
             </span>
             <span className='text-gray-500'>
-              {review.rating && '★'.repeat(5 - review.rating)}
+              {(review.rating == 0 || review.rating) &&
+                '★'.repeat(5 - review.rating)}
             </span>
           </div>
           <p className='text-gray-700'>{review.message}</p>
