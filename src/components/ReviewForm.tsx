@@ -10,7 +10,7 @@ import Swal from 'sweetalert2';
 import { createClient } from '@/lib/supabase/client';
 
 const ReviewForm = ({ orderItemId }: { orderItemId: number }) => {
-  const [rating, setRating] = useState(0);
+  const [rating, setRating] = useState(5);
   const [message, setMessage] = useState('');
   const router = useRouter();
   const supabase = createClient();
