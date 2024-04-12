@@ -1,7 +1,6 @@
 // @/components/Header.tsx
 
 import Link from 'next/link';
-import { Suspense } from 'react';
 
 import { createClient } from '@/lib/supabase/server';
 
@@ -45,9 +44,7 @@ const Header: React.FC = async () => {
           )}
         </div>
       </div>
-      <Suspense fallback={<></>}>
-        <LatestNotice></LatestNotice>
-      </Suspense>
+      <LatestNotice></LatestNotice>
     </div>
   );
 };

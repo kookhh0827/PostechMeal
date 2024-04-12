@@ -1,6 +1,7 @@
 // @/components/LatestNotice.tsx
 
 import { JSDOM } from 'jsdom';
+import { cache } from 'react';
 
 const LatestNotice: React.FC = async () => {
   const latestArticle = await extractLatestArticleTitle();
@@ -20,7 +21,7 @@ const LatestNotice: React.FC = async () => {
   );
 };
 
-const extractLatestArticleTitle = async () => {
+const extractLatestArticleTitle = cache(async () => {
   const response = await fetch('https://dining.postech.ac.kr/notice/', {
     cache: 'force-cache',
   });
@@ -38,6 +39,6 @@ const extractLatestArticleTitle = async () => {
   }
 
   return null;
-};
+});
 
 export default LatestNotice;
