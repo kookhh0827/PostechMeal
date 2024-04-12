@@ -1,10 +1,11 @@
 // @/components/Header.tsx
 
-import { JSDOM } from 'jsdom';
 import Link from 'next/link';
+import { Suspense } from 'react';
 
 import { createClient } from '@/lib/supabase/server';
 
+import LatestNotice from '@/components/LatestNotice';
 import LinkWrapper from '@/components/LinkWrapper';
 import LogoutButton from '@/components/LogoutButton';
 
@@ -15,13 +16,6 @@ const Header: React.FC = async () => {
     .from('accounts')
     .select('nickname')
     .maybeSingle();
-
-  // Fetch the HTML content from the URL
-  const response = await fetch('https://dining.postech.ac.kr/notice/');
-  const htmlContent = await response.text();
-
-  // Extract the most recent article's title from the HTML content
-  const latestArticle = extractLatestArticleTitle(htmlContent);
 
   return (
     <div>
@@ -51,36 +45,11 @@ const Header: React.FC = async () => {
           )}
         </div>
       </div>
-      {latestArticle && (
-        <div className='bg-yellow-100 text-yellow-800 px-4 py-2 rounded mb-4 text-xs md:text-base'>
-          (복지회 최신 공지사항){' '}
-          <a
-            href={'https://dining.postech.ac.kr' + latestArticle.link}
-            target='blank'
-          >
-            {latestArticle.title}
-          </a>
-        </div>
-      )}
+      <Suspense fallback={<></>}>
+        <LatestNotice></LatestNotice>
+      </Suspense>
     </div>
   );
-};
-
-// Function to extract the latest article's title from the HTML content
-const extractLatestArticleTitle = (htmlContent: string) => {
-  const dom = new JSDOM(htmlContent);
-  const doc = dom.window.document;
-  const latestArticle = doc.querySelector(
-    'tr:not(.kboard-list-notice) .kboard-list-title a'
-  );
-
-  if (latestArticle) {
-    const title = latestArticle.textContent?.trim() || '';
-    const link = latestArticle.getAttribute('href') || '';
-    return { title, link };
-  }
-
-  return null;
 };
 
 export default Header;
