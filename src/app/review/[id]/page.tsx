@@ -9,13 +9,18 @@ import ReturnButton from '@/components/ReturnButton';
 import ReviewSection from '@/components/ReviewSection';
 import StarRating from '@/components/StarRating';
 
-const OrderItemReviewPage = async ({ params }: { params: { id: number } }) => {
+const fetchOrderItem = async (orderitem_id: number) => {
   const supabase = createClient();
   const { data: orderitem } = await supabase
     .from('orderitem_with_avg_rating')
     .select('*')
-    .eq('orderitem_id', params.id)
+    .eq('orderitem_id', orderitem_id)
     .maybeSingle();
+  return orderitem;
+};
+
+const OrderItemReviewPage = async ({ params }: { params: { id: number } }) => {
+  const orderitem = await fetchOrderItem(params.id);
 
   return (
     <div className='container mx-auto py-8 px-1.5'>
