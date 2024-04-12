@@ -16,7 +16,6 @@ type Meal = Tables<'meals'> & {
 interface MealCalendarProps {
   restaurantInfo: Restaurant;
   initialMeals: Meal[] | null;
-  initialisMobile: boolean;
 }
 
 function mealtypetokorean(mealtype: string) {
@@ -32,11 +31,9 @@ function mealtypetokorean(mealtype: string) {
 const MealCalendar: React.FC<MealCalendarProps> = ({
   restaurantInfo,
   initialMeals,
-  initialisMobile,
 }) => {
   const [selectedWeek, setSelectedWeek] = useState(new Date());
   const [meals, setMeals] = useState<Meal[] | null>(initialMeals);
-  const [isMobile, setIsMobile] = useState(initialisMobile);
 
   useEffect(() => {
     const fetchMealsForWeek = async (week: Date) => {
@@ -73,19 +70,6 @@ const MealCalendar: React.FC<MealCalendarProps> = ({
     };
     fetchMealsForWeek(selectedWeek);
   }, [restaurantInfo, selectedWeek]);
-
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768); // Adjust the breakpoint as needed
-    };
-
-    handleResize(); // Check initial window size
-    window.addEventListener('resize', handleResize);
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
 
   const renderMealsByDate = (date: string) => {
     if (!meals) {
@@ -145,7 +129,6 @@ const MealCalendar: React.FC<MealCalendarProps> = ({
 
   return (
     <div className='mx-auto'>
-      {/* {<h2 className='text-2xl font-bold mb-4'>{restaurantInfo.name} 식단</h2>} */}
       {restaurantInfo.location && (
         <p className='text-lg mb-4'>위치: {restaurantInfo.location}</p>
       )}
@@ -169,73 +152,62 @@ const MealCalendar: React.FC<MealCalendarProps> = ({
           </p>
         )}
       </div>
-      {!isMobile ? (
-        <>
-          <div className='mb-4'>
-            <button
-              className='px-4 py-2 bg-blue-500 text-white rounded mr-2'
-              onClick={() => {
-                const prevWeek = startOfWeek(addDays(selectedWeek, -7), {
-                  weekStartsOn: 1,
-                });
-                setSelectedWeek(prevWeek);
-              }}
-            >
-              이전주
-            </button>
-            <button
-              className='px-4 py-2 bg-blue-500 text-white rounded'
-              onClick={() => {
-                const nextWeek = startOfWeek(addDays(selectedWeek, 7), {
-                  weekStartsOn: 1,
-                });
-                setSelectedWeek(nextWeek);
-              }}
-            >
-              다음주
-            </button>
-          </div>
-          <div className='text-lg font-bold mb-4'>
-            {format(startOfWeekDate, 'yyyy-MM-dd')} 부터{' '}
-            {format(endOfWeekDate, 'yyyy-MM-dd')} 까지
-          </div>
-          <div className='grid grid-cols-7 gap-4'>
-            {Array.from({ length: 7 }).map((_, index) => {
-              const date = format(
-                addDays(startOfWeekDate, index),
-                'yyyy-MM-dd'
-              );
-              const isToday = date === format(new Date(), 'yyyy-MM-dd');
-              return (
-                <div
-                  key={date}
-                  className={`border p-4 ${isToday ? 'bg-yellow-100' : ''}`}
-                >
-                  {renderMealsByDate(date)}
-                </div>
-              );
-            })}
-          </div>
-        </>
-      ) : (
-        <div className='border p-4'>
-          <div className='flex justify-between items-center mb-4'>
-            <button
-              className='px-4 py-2 bg-blue-500 text-white rounded'
-              onClick={handlePrevDay}
-            >
-              이전날
-            </button>
-            <button
-              className='px-4 py-2 bg-blue-500 text-white rounded'
-              onClick={handleNextDay}
-            >
-              다음날
-            </button>
-          </div>
-          {renderMealsByDate(format(selectedWeek, 'yyyy-MM-dd'))}
+      <div className='mb-4 flex justify-between items-center'>
+        <button
+          className='px-4 py-2 bg-blue-500 text-white rounded hidden sm:block'
+          onClick={() => {
+            const prevWeek = startOfWeek(addDays(selectedWeek, -7), {
+              weekStartsOn: 1,
+            });
+            setSelectedWeek(prevWeek);
+          }}
+        >
+          이전주
+        </button>
+        <div className='text-lg font-bold hidden sm:block'>
+          {format(startOfWeekDate, 'yyyy-MM-dd')} 부터{' '}
+          {format(endOfWeekDate, 'yyyy-MM-dd')} 까지
         </div>
-      )}
+        <button
+          className='px-4 py-2 bg-blue-500 text-white rounded hidden sm:block'
+          onClick={() => {
+            const nextWeek = startOfWeek(addDays(selectedWeek, 7), {
+              weekStartsOn: 1,
+            });
+            setSelectedWeek(nextWeek);
+          }}
+        >
+          다음주
+        </button>
+      </div>
+      <div className='grid grid-cols-1 sm:grid-cols-7 gap-4'>
+        {Array.from({ length: 7 }).map((_, index) => {
+          const date = format(addDays(startOfWeekDate, index), 'yyyy-MM-dd');
+          const isShown = date === format(selectedWeek, 'yyyy-MM-dd');
+          return (
+            <div
+              key={date}
+              className={`border p-4 ${isShown ? 'block' : 'hidden'} sm:block`}
+            >
+              <div className='flex justify-between items-center mb-4 sm:hidden'>
+                <button
+                  className='px-4 py-2 bg-blue-500 text-white rounded'
+                  onClick={handlePrevDay}
+                >
+                  이전날
+                </button>
+                <button
+                  className='px-4 py-2 bg-blue-500 text-white rounded'
+                  onClick={handleNextDay}
+                >
+                  다음날
+                </button>
+              </div>
+              {renderMealsByDate(date)}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };

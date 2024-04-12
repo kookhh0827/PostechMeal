@@ -1,8 +1,6 @@
 // @/app/restaurant/[id].tsx
 
 import { endOfWeek, format, startOfWeek } from 'date-fns';
-import { headers } from 'next/headers';
-import { getSelectorsByUserAgent } from 'react-device-detect';
 
 import { Tables } from '@/lib/database.types';
 import { createPrivateClient } from '@/lib/supabase/private';
@@ -88,9 +86,6 @@ const OrderItemReviewPage = async ({ params }: { params: { id: string } }) => {
   const restaurantInfo = restaurants?.filter(
     (restaurant) => restaurant.restaurant_id === id
   )[0];
-  const { isMobile } = getSelectorsByUserAgent(
-    headers().get('user-agent') ?? ''
-  );
 
   return (
     <div className='container mx-auto py-8 px-1.5'>
@@ -103,7 +98,6 @@ const OrderItemReviewPage = async ({ params }: { params: { id: string } }) => {
         <MealCalendar
           restaurantInfo={restaurantInfo}
           initialMeals={await fetchMealsForWeek(new Date(), id)}
-          initialisMobile={isMobile}
         />
       ) : (
         restaurantInfo && (
