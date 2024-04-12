@@ -11,22 +11,15 @@ import { createClient } from '@/lib/supabase/client';
 import ReviewForm from '@/components/ReviewForm';
 
 type Reviews = Tables<'reviews_with_nickname'>;
-
-interface ReviewListProps {
-  orderItemId: number;
-  refreshReviews: boolean;
-  onReviewEdit?: () => void;
-  onReviewDelete?: () => void;
-}
-
 const supabase = createClient();
 
 const ReviewList = ({
   orderItemId,
   refreshReviews,
-  onReviewEdit,
-  onReviewDelete,
-}: ReviewListProps) => {
+}: {
+  orderItemId: number;
+  refreshReviews: boolean;
+}) => {
   const [users_id, setUsersId] = useState<string | undefined>();
   const [reviews, setReviews] = useState<Reviews[]>([]);
   const [editingReviewId, setEditingReviewId] = useState<number | null>(null);
@@ -88,9 +81,6 @@ const ReviewList = ({
         setReviews((prevReviews) =>
           prevReviews.filter((review) => review.review_id !== reviewId)
         );
-        if (onReviewDelete) {
-          onReviewDelete();
-        }
       }
     }
   };
@@ -114,9 +104,6 @@ const ReviewList = ({
             : review
         )
       );
-      if (onReviewEdit) {
-        onReviewEdit();
-      }
     }
   };
 
