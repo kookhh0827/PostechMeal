@@ -187,7 +187,9 @@ const MealCalendar: React.FC<MealCalendarProps> = ({
           return (
             <div
               key={date}
-              className={`border p-4 ${isShown ? 'block' : 'hidden'} sm:block`}
+              className={`border p-4 ${isShown ? 'block' : 'hidden'} sm:block ${
+                isShown ? ' md:bg-yellow-100' : ''
+              }`}
             >
               <div className='flex justify-between items-center mb-4 sm:hidden'>
                 <button
