@@ -3,7 +3,6 @@
 import { endOfWeek, format, startOfWeek } from 'date-fns';
 
 import { Tables } from '@/lib/database.types';
-import { createPrivateClient } from '@/lib/supabase/private';
 import { createClient } from '@/lib/supabase/server';
 
 import CommentBox from '@/components/CommentBox';
@@ -13,19 +12,6 @@ import OrderCalendar from '@/components/OrderCalander';
 import RestaurantTabs from '@/components/RestaurantTabs';
 
 export const dynamic = 'force-static';
-
-export async function generateStaticParams() {
-  const supabase = createPrivateClient();
-  const { data: restaurants } = await supabase
-    .from('restaurants')
-    .select('*')
-    .order('restaurant_id');
-
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  return restaurants!.map((restaurant) => ({
-    id: restaurant.restaurant_id.toString(),
-  }));
-}
 
 const fetchMealsForWeek = async (week: Date, restaurant_id: number) => {
   const supabase = createClient();
