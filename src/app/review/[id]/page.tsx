@@ -6,8 +6,7 @@ import { createClient } from '@/lib/supabase/server';
 
 import Header from '@/components/Header';
 import ReturnButton from '@/components/ReturnButton';
-import ReviewForm from '@/components/ReviewForm';
-import ReviewList from '@/components/ReviewList';
+import ReviewSection from '@/components/ReviewSection';
 import StarRating from '@/components/StarRating';
 
 const OrderItemReviewPage = async ({ params }: { params: { id: number } }) => {
@@ -50,9 +49,7 @@ const OrderItemReviewPage = async ({ params }: { params: { id: number } }) => {
           </div>
         </div>
       </div>
-      <ReviewForm orderItemId={params.id} />
-      <div className='mb-10'></div>
-      <ReviewList orderItemId={params.id} />
+      <ReviewSection orderItemId={params.id}></ReviewSection>
     </div>
   );
 };

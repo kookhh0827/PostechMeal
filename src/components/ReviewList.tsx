@@ -1,15 +1,108 @@
+'use client';
 // ReviewList.tsx
 
 import { format } from 'date-fns';
+import { useEffect, useState } from 'react';
+import Swal from 'sweetalert2';
 
-import { createClient } from '@/lib/supabase/server';
+import { Tables } from '@/lib/database.types';
+import { createClient } from '@/lib/supabase/client';
 
-const ReviewList = async ({ orderItemId }: { orderItemId: number }) => {
-  const supabase = createClient();
-  const { data: reviews } = await supabase
-    .from('reviews_with_nickname')
-    .select('*')
-    .eq('orderitem_id', orderItemId);
+import ReviewForm from '@/components/ReviewForm';
+
+type Reviews = Tables<'reviews_with_nickname'>;
+const supabase = createClient();
+
+const ReviewList = ({
+  orderItemId,
+  refreshReviews,
+}: {
+  orderItemId: number;
+  refreshReviews: boolean;
+}) => {
+  const [users_id, setUsersId] = useState<string | undefined>();
+  const [reviews, setReviews] = useState<Reviews[]>([]);
+  const [editingReviewId, setEditingReviewId] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const { data: userData, error: userError } =
+        await supabase.auth.getUser();
+      if (userError) {
+        return;
+      } else {
+        setUsersId(userData.user?.id);
+      }
+
+      const { data: reviewsData, error: reviewsError } = await supabase
+        .from('reviews_with_nickname')
+        .select('*')
+        .eq('orderitem_id', orderItemId);
+      if (reviewsError) {
+        return;
+      } else {
+        setReviews(reviewsData || []);
+      }
+    };
+
+    fetchData();
+  }, [orderItemId, refreshReviews]);
+
+  const handleEditClick = (reviewId: number) => {
+    setEditingReviewId(reviewId);
+  };
+
+  const handleCancelClick = () => {
+    setEditingReviewId(null);
+  };
+
+  const handleDeleteClick = async (reviewId: number) => {
+    const result = await Swal.fire({
+      title: '리뷰 삭제',
+      text: '리뷰를 삭제하시겠습니까?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: '삭제',
+      cancelButtonText: '취소',
+    });
+
+    if (result.isConfirmed) {
+      const { error } = await supabase
+        .from('reviews')
+        .delete()
+        .eq('review_id', reviewId);
+
+      if (!error) {
+        setReviews((prevReviews) =>
+          prevReviews.filter((review) => review.review_id !== reviewId)
+        );
+      }
+    }
+  };
+
+  const handleSaveClick = async (
+    reviewId: number,
+    rating: number,
+    message: string
+  ) => {
+    const { error } = await supabase
+      .from('reviews')
+      .update({ rating, message })
+      .eq('review_id', reviewId);
+
+    if (!error) {
+      setEditingReviewId(null);
+      setReviews((prevReviews) =>
+        prevReviews.map((review) =>
+          review.review_id === reviewId
+            ? { ...review, rating, message }
+            : review
+        )
+      );
+    }
+  };
 
   return (
     <div className='space-y-4'>
@@ -27,18 +120,52 @@ const ReviewList = async ({ orderItemId }: { orderItemId: number }) => {
                 format(new Date(review.created_at), 'yyyy-MM-dd HH:mm:ss')}
             </p>
           </div>
-          <div className='flex items-center mb-2'>
-            <span className='text-yellow-500'>
-              {review.rating && review.rating > 0
-                ? '★'.repeat(review.rating)
-                : null}
-            </span>
-            <span className='text-gray-500'>
-              {(review.rating == 0 || review.rating) &&
-                '★'.repeat(5 - review.rating)}
-            </span>
-          </div>
-          <p className='text-gray-700'>{review.message}</p>
+          {editingReviewId && editingReviewId === review.review_id ? (
+            <ReviewForm
+              orderItemId={orderItemId}
+              initialRating={review.rating || 0}
+              initialMessage={review.message || ''}
+              onSave={(rating, message) =>
+                handleSaveClick(editingReviewId, rating, message)
+              }
+              onCancel={handleCancelClick}
+            />
+          ) : (
+            <>
+              <div className='flex items-center mb-2'>
+                <span className='text-yellow-500'>
+                  {review.rating && review.rating > 0
+                    ? '★'.repeat(review.rating)
+                    : null}
+                </span>
+                <span className='text-gray-500'>
+                  {(review.rating == 0 || review.rating) &&
+                    '★'.repeat(5 - review.rating)}
+                </span>
+              </div>
+              <p className='text-gray-700'>{review.message}</p>
+              {review.users_id === users_id && (
+                <div className='mt-2'>
+                  <button
+                    onClick={() =>
+                      review.review_id && handleEditClick(review.review_id)
+                    }
+                    className='text-blue-500 hover:underline mr-2'
+                  >
+                    수정
+                  </button>
+                  <button
+                    onClick={() =>
+                      review.review_id && handleDeleteClick(review.review_id)
+                    }
+                    className='text-red-500 hover:underline'
+                  >
+                    삭제
+                  </button>
+                </div>
+              )}
+            </>
+          )}
         </div>
       ))}
       {reviews?.length == 0 && (

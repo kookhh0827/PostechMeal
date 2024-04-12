@@ -25,7 +25,7 @@ const CommentBox: React.FC<CommentBoxProps> = ({ restaurant_id }) => {
   useEffect(() => {
     fetchComments();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [selectedOrdering]);
 
   const fetchComments = async () => {
     let query = supabase
