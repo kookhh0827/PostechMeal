@@ -12,6 +12,8 @@ import MealCalendar from '@/components/MealCalendar';
 import OrderCalendar from '@/components/OrderCalander';
 import RestaurantTabs from '@/components/RestaurantTabs';
 
+export const dynamic = 'force-static';
+
 export async function generateStaticParams() {
   const supabase = createPrivateClient();
   const { data: restaurants } = await supabase
