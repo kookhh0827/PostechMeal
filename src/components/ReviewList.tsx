@@ -25,7 +25,7 @@ const ReviewList = ({
   const [editingReviewId, setEditingReviewId] = useState<number | null>(null);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchUser = async () => {
       const { data: userData, error: userError } =
         await supabase.auth.getUser();
       if (userError) {
@@ -33,7 +33,9 @@ const ReviewList = ({
       } else {
         setUsersId(userData.user?.id);
       }
+    };
 
+    const fetchReviews = async () => {
       const { data: reviewsData, error: reviewsError } = await supabase
         .from('reviews_with_nickname')
         .select('*')
@@ -45,7 +47,8 @@ const ReviewList = ({
       }
     };
 
-    fetchData();
+    fetchUser();
+    fetchReviews();
   }, [orderItemId, refreshReviews]);
 
   const handleEditClick = (reviewId: number) => {
