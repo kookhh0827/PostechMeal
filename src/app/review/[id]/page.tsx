@@ -10,7 +10,6 @@ import ReviewSection from '@/components/ReviewSection';
 import StarRating from '@/components/StarRating';
 
 export const dynamic = 'force-static';
-export const revalidate = 30;
 
 const fetchOrderItem = async (orderitem_id: number) => {
   const supabase = createClient();
