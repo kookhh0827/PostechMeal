@@ -8,8 +8,6 @@ import LatestNotice from '@/components/LatestNotice';
 import LinkWrapper from '@/components/LinkWrapper';
 import LogoutButton from '@/components/LogoutButton';
 
-export const revalidate = 0;
-
 const Header: React.FC = async () => {
   const supabase = createClient();
 

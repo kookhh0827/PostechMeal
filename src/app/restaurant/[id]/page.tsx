@@ -11,9 +11,6 @@ import MealCalendar from '@/components/MealCalendar';
 import OrderCalendar from '@/components/OrderCalander';
 import RestaurantTabs from '@/components/RestaurantTabs';
 
-export const dynamic = 'force-static';
-export const revalidate = 1;
-
 const fetchMealsForWeek = async (week: Date, restaurant_id: number) => {
   const supabase = createClient();
   const startDate = format(
