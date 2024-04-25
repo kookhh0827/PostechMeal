@@ -6,6 +6,7 @@ import { Tables } from '@/lib/database.types';
 import { createClient } from '@/lib/supabase/server';
 
 import CommentBox from '@/components/CommentBox';
+import Header from '@/components/Header';
 import MealCalendar from '@/components/MealCalendar';
 import OrderCalendar from '@/components/OrderCalander';
 import RestaurantTabs from '@/components/RestaurantTabs';
@@ -74,6 +75,7 @@ const OrderItemReviewPage = async ({ params }: { params: { id: string } }) => {
 
   return (
     <div className='container mx-auto py-8 px-1.5'>
+      <Header></Header>
       <RestaurantTabs
         restaurants={restaurants as Restaurant[]}
         selectedRestaurant={id}
