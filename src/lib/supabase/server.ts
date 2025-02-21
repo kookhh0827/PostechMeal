@@ -3,8 +3,8 @@ import { cookies } from 'next/headers';
 
 import { Database } from '@/lib/database.types';
 
-export function createClient() {
-  const cookieStore = cookies();
+export async function createClient() {
+  const cookieStore = await cookies();
 
   return createServerClient<Database>(
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -29,7 +29,7 @@ export function createClient() {
           try {
             cookieStore.set({ name, value: '', ...options });
           } catch (error) {
-            // The `delete` method was called from a Server Component.
+            // The `remove` method was called from a Server Component.
             // This can be ignored if you have middleware refreshing
             // user sessions.
           }

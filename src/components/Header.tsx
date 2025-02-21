@@ -9,7 +9,7 @@ import LinkWrapper from '@/components/LinkWrapper';
 import LogoutButton from '@/components/LogoutButton';
 
 const Header: React.FC = async () => {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { data: userData } = await supabase
     .from('accounts')
@@ -26,7 +26,7 @@ const Header: React.FC = async () => {
           {userData?.nickname ? (
             <div className='flex items-center space-x-4'>
               <span className='text-gray-700'>{userData.nickname}</span>
-              <LogoutButton></LogoutButton>
+              <LogoutButton />
             </div>
           ) : (
             <div className='space-x-4'>
@@ -44,7 +44,7 @@ const Header: React.FC = async () => {
           )}
         </div>
       </div>
-      <LatestNotice></LatestNotice>
+      <LatestNotice />
     </div>
   );
 };
